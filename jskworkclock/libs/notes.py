@@ -47,7 +47,7 @@ class NotesDialog(BData, TtkBase, tk.Toplevel):
 
     def __init_ui(self) -> None:
         """Create user interface."""
-        self.geometry("400x200")
+        self.geometry("400x300")
 
         ico = tk.PhotoImage(data=ImageBase64.ICO)
         self.wm_iconphoto(False, ico)

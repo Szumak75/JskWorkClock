@@ -34,6 +34,7 @@ from libs.database import Database, TWorkTime
 from libs.keys import Keys
 from libs.notes import NotesDialog
 from libs.report import ReportDialog
+from libs.heper import TkPack
 
 
 class MainFrame(TtkBase, BDbHandler, ttk.Frame):
@@ -75,7 +76,7 @@ class MainFrame(TtkBase, BDbHandler, ttk.Frame):
         )
         self._data[Keys.THCLOCK].start()
         self._data[Keys.BTSTART][Keys.STATE] = tk.DISABLED
-        self._data[Keys.BTSTOP][Keys.STATE] = tk.ACTIVE
+        self._data[Keys.BTSTOP][Keys.STATE] = tk.NORMAL
 
     def bt_stop(self) -> None:
         """[Stop] click."""
@@ -93,7 +94,7 @@ class MainFrame(TtkBase, BDbHandler, ttk.Frame):
                 self.master.title(f"{title}: {etime}")  # type: ignore
             sleep(1)
 
-        self._data[Keys.BTSTART][Keys.STATE] = tk.ACTIVE
+        self._data[Keys.BTSTART][Keys.STATE] = tk.NORMAL
         self._data[Keys.BTSTOP][Keys.STATE] = tk.DISABLED
         # raise message box for notes
         dialog = NotesDialog(self.master)
@@ -182,12 +183,15 @@ class WorkClock(TkBase, BDbHandler, tk.Tk):
         self.resizable(False, False)
         ico = tk.PhotoImage(data=ImageBase64.ICO)
         self.wm_iconphoto(False, ico)
-        self.columnconfigure(0, weight=1)
 
         self.protocol("WM_DELETE_WINDOW", self.__quit_window)
 
         mf = MainFrame(self, self._db_handler)
-        mf.grid(column=0, row=0, sticky=tk.NSEW)
+        # mf.grid(column=0, row=0, sticky=tk.NSEW)
+        mf.pack(
+            side=TkPack.Side.TOP, fill=TkPack.Fill.BOTH, anchor=TkPack.Anchor.CENTER
+        )
+
         # menu
         menubar = tk.Menu(self)
         # File
