@@ -5,26 +5,34 @@
   Created: 22.12.2023, 15:18:32
   
   Purpose: 
+
+  Printers example
+  https://gist.github.com/mutaku/1928574
 """
+
 
 import os
 import tkinter as tk
 
 from tkinter import ttk
 from time import sleep
-from typing import Optional
+from turtle import heading
+from typing import Optional, Literal, List, Tuple
 from PIL import Image, ImageDraw
 from time import sleep
 from threading import Thread
 from inspect import currentframe
-from datetime import timedelta
+from datetime import timedelta, datetime
+
+from sqlalchemy.orm import Session
+from sqlalchemy.sql import func
 
 from jsktoolbox.libs.base_data import BData
 from jsktoolbox.datetool import DateTime, Timestamp
 from jsktoolbox.attribtool import ReadOnlyClass
 from jsktoolbox.libs.system import PathChecker, Env
 from jsktoolbox.raisetool import Raise
-from pytest import Session
+
 
 from libs.base import TkBase, TtkBase
 from libs.ico import ImageBase64
@@ -55,28 +63,116 @@ class ReportDialog(TtkBase, BDbHandler, tk.Toplevel):
 
         ico = tk.PhotoImage(data=ImageBase64.ICO)
         self.wm_iconphoto(False, ico)
-        self.columnconfigure(0, weight=1)
 
         self.protocol("WM_DELETE_WINDOW", self.__on_closing)
 
         # content
-        main_frame = tk.Frame(self, borderwidth=2, relief=tk.RAISED)
-        main_frame.pack(expand=True, fill=tk.BOTH)
-        sub_frame = tk.Frame(main_frame, borderwidth=2, relief=tk.SUNKEN)
-        sub_frame.place(relx=2, rely=2, anchor=tk.CENTER)
-        sub_frame.pack(expand=True, fill=tk.BOTH)
+
+        # Sizegrip
+        sizegrip = ttk.Sizegrip(self)
+        sizegrip.pack(side=TkPack.Side.BOTTOM, anchor=TkPack.Anchor.E)
+
+        # Data Frame
+        data_frame = ttk.Frame(self)
+        data_frame.pack(side=TkPack.Side.TOP, expand=True, fill=TkPack.Fill.BOTH)
+
+        # treeview
+        columns: tuple[Literal["date"], Literal["elapsed_time"], Literal["note"]] = (
+            "date",
+            "elapsed_time",
+            "note",
+        )
+        tree = ttk.Treeview(data_frame, columns=columns, show="headings")
+        tree.heading(columns[0], text="Date")
+        tree.column(columns[0], minwidth=0, width=150, stretch=False)
+        tree.heading(columns[1], text="Elapsed time")
+        tree.column(columns[1], minwidth=0, width=100, stretch=False)
+        tree.heading(columns[2], text="Note")
+        tree.column(columns[2], minwidth=0, width=400)
+
+        tree.pack(side=TkPack.Side.LEFT, fill=TkPack.Fill.BOTH, expand=True)
+
+        # tree data
+        for item in self.__get_data():
+            tree.insert("", tk.END, values=item)
+
+        # separator
+        sep = ttk.Separator(self, orient=tk.HORIZONTAL)
+        sep.pack(fill=TkPack.Fill.X)
 
         # Button Frame
-        bt_frame = tk.Frame(
-            sub_frame, background="red", borderwidth=4, relief=tk.SUNKEN
-        )
-        bt_frame.place(anchor=tk.CENTER, relx=4, rely=4, height=20)
-        bt_frame.pack(expand=True)
-        # Data Frame
+        bt_frame = ttk.Frame(self)
+        bt_frame.pack(side=TkPack.Side.TOP, fill=TkPack.Fill.X, padx=5, pady=5)
+
+        # add close button
+        close_button = ttk.Button(bt_frame, text="Close", command=self.__bt_close)
+        close_button.pack(side=TkPack.Side.RIGHT, padx=2)
 
     def __on_closing(self) -> None:
         self._data[Keys.WCLOSED] = True
         self.destroy()
+
+    def __bt_close(self) -> None:
+        self.__on_closing()
+
+    def __get_data(self):  # -> tuple[Any, ...]:
+        session: Session | None = self._db_handler.session
+
+        if session is None:
+            return tuple()
+
+        # cleanup garbage
+        dataset = session.query(TWorkTime).filter(TWorkTime.duration <= 120).all()
+        for item in dataset:
+            session.delete(item)
+        if dataset:
+            session.commit()
+
+        # getting report
+        dsum = 0
+        out = list()
+        tmp: datetime = DateTime.now()
+        # beginning of the month timestamp
+        bmonth: int = int(datetime(year=tmp.year, month=tmp.month, day=1).timestamp())
+        row = (
+            session.query(func.sum(TWorkTime.duration))
+            .filter(TWorkTime.start < bmonth)
+            .first()
+        )
+        if row and row[0] is not None:
+            dsum += row[0]
+            out.append(
+                (
+                    DateTime.datetime_from_timestamp(bmonth),
+                    DateTime.elapsed_time_from_seconds(dsum),
+                    "Balance of the previous month",
+                )
+            )
+
+        # getting data for the current month
+        dataset: List[TWorkTime] = (
+            session.query(TWorkTime)
+            .filter(TWorkTime.start > bmonth)
+            .order_by(TWorkTime.id)
+            .all()
+        )
+        for item in dataset:
+            idate: datetime = DateTime.datetime_from_timestamp(item.start)
+            idur: timedelta = DateTime.elapsed_time_from_seconds(item.duration)
+            dsum += item.duration
+            out.append((idate, idur, item.notes))
+
+        if dataset:
+            out.append(
+                (
+                    DateTime.datetime_from_timestamp(Timestamp.now),
+                    DateTime.elapsed_time_from_seconds(dsum),
+                    "Current Balance",
+                )
+            )
+
+        session.close()
+        return tuple(out)
 
     @property
     def is_closed(self) -> bool:

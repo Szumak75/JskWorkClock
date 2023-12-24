@@ -53,6 +53,9 @@ class TWorkTime(LocalBase):
     duration: Mapped[int] = mapped_column(INTEGER, nullable=False)
     notes: Mapped[str] = mapped_column(TEXT, default="")
 
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}(id='{self.id}', start='{self.start}', duration='{self.duration}', notes='{self.notes}')"
+
 
 class Database(BData):
     """Database class engine for local data."""
