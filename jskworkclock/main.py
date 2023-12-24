@@ -147,15 +147,6 @@ class WorkClock(TkBase, BDbHandler, tk.Tk):
 
     def __init_db(self) -> None:
         """Initialize database connection."""
-        # init window
-        self.title("Working Time")
-        self.geometry("300x36")
-        self.resizable(False, False)
-        ico = tk.PhotoImage(data=ImageBase64.ICO)
-        self.wm_iconphoto(False, ico)
-        self.columnconfigure(0, weight=1)
-
-        self.protocol("WM_DELETE_WINDOW", self.__quit_window)
         tmp: str = os.path.join(
             Env.home, self._data[Keys.CACHEDIR], self._data[Keys.DATABASE]
         )
@@ -185,6 +176,16 @@ class WorkClock(TkBase, BDbHandler, tk.Tk):
 
     def __init_ui(self) -> None:
         """Initialize GUI."""
+        # init window
+        self.title("Working Time")
+        self.geometry("300x40")
+        self.resizable(False, False)
+        ico = tk.PhotoImage(data=ImageBase64.ICO)
+        self.wm_iconphoto(False, ico)
+        self.columnconfigure(0, weight=1)
+
+        self.protocol("WM_DELETE_WINDOW", self.__quit_window)
+
         mf = MainFrame(self, self._db_handler)
         mf.grid(column=0, row=0, sticky=tk.NSEW)
         # menu
