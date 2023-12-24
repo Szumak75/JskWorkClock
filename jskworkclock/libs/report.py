@@ -59,7 +59,7 @@ class ReportDialog(TtkBase, BDbHandler, tk.Toplevel):
     def __init_ui(self) -> None:
         """Create user interface."""
         # main window
-        self.geometry("600x600")
+        self.geometry("700x600")
 
         ico = tk.PhotoImage(data=ImageBase64.ICO)
         self.wm_iconphoto(False, ico)
@@ -91,6 +91,11 @@ class ReportDialog(TtkBase, BDbHandler, tk.Toplevel):
         tree.column(columns[2], minwidth=0, width=400)
 
         tree.pack(side=TkPack.Side.LEFT, fill=TkPack.Fill.BOTH, expand=True)
+
+        # add a scrollbar
+        scrollbar = ttk.Scrollbar(data_frame, orient=tk.VERTICAL, command=tree.yview)
+        tree.configure(yscrollcommand=scrollbar.set)
+        scrollbar.pack(side=TkPack.Side.RIGHT, fill=TkPack.Fill.Y)
 
         # tree data
         for item in self.__get_data():
