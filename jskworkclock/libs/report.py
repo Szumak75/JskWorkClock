@@ -113,12 +113,30 @@ class ReportDialog(TtkBase, BDbHandler, tk.Toplevel):
         close_button = ttk.Button(bt_frame, text="Close", command=self.__bt_close)
         close_button.pack(side=TkPack.Side.RIGHT, padx=2)
 
+        # add record button
+        add_button = ttk.Button(bt_frame, text="Add Data", command=self.__bt_add)
+        add_button.pack(side=TkPack.Side.RIGHT, padx=2)
+
+        # add save button
+        save_button = ttk.Button(bt_frame, text="Save", command=self.__bt_save)
+        save_button.pack(side=TkPack.Side.RIGHT, padx=2)
+
     def __on_closing(self) -> None:
+        """On Closing Event."""
         self._data[Keys.WCLOSED] = True
         self.destroy()
 
     def __bt_close(self) -> None:
+        """Button 'Close' Event."""
         self.__on_closing()
+
+    def __bt_add(self) -> None:
+        """Button 'Add Data' Event."""
+        pass
+
+    def __bt_save(self) -> None:
+        """Button 'Save' Event."""
+        pass
 
     def __get_data(self):  # -> tuple[Any, ...]:
         session: Session | None = self._db_handler.session
