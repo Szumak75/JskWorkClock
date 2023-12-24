@@ -49,13 +49,29 @@ class ReportDialog(TtkBase, BDbHandler, tk.Toplevel):
 
     def __init_ui(self) -> None:
         """Create user interface."""
-        self.geometry("400x600")
+        # main window
+        self.geometry("600x600")
 
         ico = tk.PhotoImage(data=ImageBase64.ICO)
         self.wm_iconphoto(False, ico)
         self.columnconfigure(0, weight=1)
 
         self.protocol("WM_DELETE_WINDOW", self.__on_closing)
+
+        # content
+        main_frame = tk.Frame(self, borderwidth=2, relief=tk.RAISED)
+        main_frame.pack(expand=True, fill=tk.BOTH)
+        sub_frame = tk.Frame(main_frame, borderwidth=2, relief=tk.SUNKEN)
+        sub_frame.place(relx=2, rely=2, anchor=tk.CENTER)
+        sub_frame.pack(expand=True, fill=tk.BOTH)
+
+        # Button Frame
+        bt_frame = tk.Frame(
+            sub_frame, background="red", borderwidth=4, relief=tk.SUNKEN
+        )
+        bt_frame.place(anchor=tk.CENTER, relx=4, rely=4, height=20)
+        bt_frame.pack(expand=True)
+        # Data Frame
 
     def __on_closing(self) -> None:
         self._data[Keys.WCLOSED] = True
