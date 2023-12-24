@@ -10,6 +10,7 @@
 """
 
 import os
+from textwrap import fill
 import tkinter as tk
 
 from tkinter import ttk
@@ -55,34 +56,34 @@ class MainFrame(TtkBase, BDbHandler, ttk.Frame):
 
     def __init_ui(self) -> None:
         """Initialize GUI."""
-        self.columnconfigure(0, weight=1)
-        self.columnconfigure(1, weight=1)
-
-        self._data[Keys.BTSTART] = ttk.Button(self, text="Start", command=self.bt_start)
-        self._data[Keys.BTSTART].grid(column=0, row=0, sticky=tk.EW)
-        self._data[Keys.BTSTOP] = ttk.Button(
-            self, text="Stop", command=self.bt_stop, state=tk.DISABLED
+        self._data[Keys.BTSTART] = ttk.Button(
+            self, text="Start", command=self.__bt_start
         )
-        self._data[Keys.BTSTOP].grid(column=1, row=0, sticky=tk.EW)
+        self._data[Keys.BTSTART].pack(
+            side=TkPack.Side.LEFT, expand=True, fill=TkPack.Fill.BOTH, padx=4, pady=4
+        )
+        self._data[Keys.BTSTOP] = ttk.Button(
+            self, text="Stop", command=self.__bt_stop, state=tk.DISABLED
+        )
+        self._data[Keys.BTSTOP].pack(
+            side=TkPack.Side.RIGHT, expand=True, fill=TkPack.Fill.BOTH, padx=4, pady=4
+        )
 
-        for widget in self.winfo_children():
-            widget.grid(padx=3, pady=3)
-
-    def bt_start(self) -> None:
+    def __bt_start(self) -> None:
         """[Start] click."""
         self._data[Keys.FSTOP] = False
         self._data[Keys.THCLOCK] = Thread(
-            target=self.th_worker, name="WorkingTime worker", daemon=True
+            target=self.__th_worker, name="WorkingTime worker", daemon=True
         )
         self._data[Keys.THCLOCK].start()
         self._data[Keys.BTSTART][Keys.STATE] = tk.DISABLED
         self._data[Keys.BTSTOP][Keys.STATE] = tk.NORMAL
 
-    def bt_stop(self) -> None:
+    def __bt_stop(self) -> None:
         """[Stop] click."""
         self._data[Keys.FSTOP] = True
 
-    def th_worker(self) -> None:
+    def __th_worker(self) -> None:
         """Threaded worker."""
         notes: Optional[str] = None
         etime: Optional[timedelta] = None

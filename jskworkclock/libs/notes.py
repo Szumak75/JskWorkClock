@@ -10,14 +10,17 @@
 import os
 import tkinter as tk
 
-from tkinter import ttk
+from tkinter import Scrollbar, ttk
+from tkinter.scrolledtext import ScrolledText
 from time import sleep
+from turtle import width
 from typing import Optional
 from PIL import Image, ImageDraw
 from time import sleep
 from threading import Thread
 from inspect import currentframe
 from datetime import timedelta
+from click import command
 
 from jsktoolbox.libs.base_data import BData
 from jsktoolbox.datetool import DateTime, Timestamp
@@ -25,11 +28,13 @@ from jsktoolbox.attribtool import ReadOnlyClass
 from jsktoolbox.libs.system import PathChecker, Env
 from jsktoolbox.raisetool import Raise
 from pytest import Session
+from jskworkclock.libs.heper import TkPack
 
 from libs.base import TkBase, TtkBase
 from libs.ico import ImageBase64
 from libs.database import Database, TWorkTime
 from libs.keys import Keys
+from libs.heper import TkPack
 
 
 class NotesDialog(BData, TtkBase, tk.Toplevel):
@@ -40,6 +45,9 @@ class NotesDialog(BData, TtkBase, tk.Toplevel):
         tk.Toplevel.__init__(self, parent, *args)
         self.title(f"{parent.title()}: Notes")
 
+        # bind events
+        self.protocol("WM_DELETE_WINDOW", self.__bt_close)
+
         # init locals
         self._data[Keys.DIALOG_RETURN] = None
 
@@ -48,31 +56,36 @@ class NotesDialog(BData, TtkBase, tk.Toplevel):
     def __init_ui(self) -> None:
         """Create user interface."""
         self.geometry("400x300")
+        self.resizable(True, True)
 
         ico = tk.PhotoImage(data=ImageBase64.ICO)
         self.wm_iconphoto(False, ico)
-        self.columnconfigure(0, weight=1)
+
+        # Sizegrip
+        sizegrip = ttk.Sizegrip(self)
+        sizegrip.pack(side=TkPack.Side.BOTTOM, anchor=TkPack.Anchor.E)
+
         # add frame
-        frame = ttk.Frame(self)
-        frame.grid(column=0, row=0, padx=5, pady=5, sticky=tk.NSEW)
-        frame.columnconfigure(0, weight=4)
-        frame.columnconfigure(1, weight=1)
-        frame.columnconfigure(2, weight=1)
+        notes_frame = ttk.Frame(self)
+        notes_frame.pack(side=TkPack.Side.TOP, fill=TkPack.Fill.BOTH, expand=True)
         # add entry
-        notes = tk.Text(frame, height=8)
-        notes.grid(column=0, row=0, columnspan=3, sticky=tk.EW)
+        notes = ScrolledText(notes_frame, width=50, height=10)
         self._data[Keys.DNOTES] = notes
+        notes.pack(side=TkPack.Side.LEFT, fill=TkPack.Fill.BOTH, expand=True)
+
+        # separator
+        sep = ttk.Separator(self, orient=tk.HORIZONTAL)
+        sep.pack(fill=TkPack.Fill.X)
+
         # add button frame
-        bt_frame = ttk.Frame(frame)
-        bt_frame.grid(column=0, row=1, columnspan=3, sticky=tk.E, padx=1, pady=1)
-        bt_frame.columnconfigure(0)
-        bt_frame.columnconfigure(1)
-        # add ok buton
-        ok_button = ttk.Button(bt_frame, text="Ok", command=self.__bt_ok)
-        ok_button.grid(column=0, row=0, sticky=tk.E)
+        bt_frame = ttk.Frame(self)
+        bt_frame.pack(side=TkPack.Side.TOP, fill=TkPack.Fill.X, padx=5, pady=5)
         # add close button
         close_button = ttk.Button(bt_frame, text="Close", command=self.__bt_close)
-        close_button.grid(column=1, row=0, sticky=tk.E)
+        close_button.pack(side=TkPack.Side.RIGHT, padx=2)
+        # add ok buton
+        ok_button = ttk.Button(bt_frame, text="Ok", command=self.__bt_ok)
+        ok_button.pack(side=TkPack.Side.RIGHT, padx=2)
 
         # modal?
         # self.root.wait_visibility()
