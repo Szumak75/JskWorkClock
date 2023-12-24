@@ -1,0 +1,13 @@
+{
+    "python.analysis.typeCheckingMode": "basic",
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "driver": "SQLite",
+            "name": "JskWorkClock",
+            "database": "/home/szumak/.cache/jskworkclock/data.sqlite",
+            "group": "Local Projects"
+        }
+    ],
+    "sqltools.useNodeRuntime": true
+}
