@@ -7,6 +7,7 @@
   Purpose:
 
   https://www.pythontutorial.net/tkinter/tkinter-object-oriented-frame/
+  https://ttkbootstrap.readthedocs.io/en/version-0.5/widgets/spinbox.html
 """
 
 import os

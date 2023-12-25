@@ -24,6 +24,8 @@ from threading import Thread
 from inspect import currentframe
 from datetime import timedelta, datetime
 
+from tkcalendar import Calendar
+
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import func
 
@@ -39,7 +41,39 @@ from libs.ico import ImageBase64
 from libs.database import Database, TWorkTime
 from libs.keys import Keys
 from libs.base import BDbHandler
-from libs.heper import TkPack
+from libs.heper import TkGrid, TkPack
+
+
+class DataFrame(BData, TtkBase, ttk.Frame):
+    """DataFrame for AddDataDialog."""
+
+    def __init__(self, parent, *args) -> None:
+        super().__init__(parent, *args)
+
+        # grid configure
+        self.columnconfigure(0)
+        self.columnconfigure(1)
+
+        self.rowconfigure(0)
+        self.rowconfigure(1)
+
+        # labels
+        ldate = ttk.LabelFrame(master=self, text=" Date ")
+        ldate.grid(column=0, row=0, padx=5, pady=5, ipadx=5, ipady=5)
+
+        ltime = ttk.LabelFrame(master=self, text=" Elapsed time ")
+        ltime.grid(column=1, row=0, padx=5, pady=5, ipadx=5, ipady=5)
+
+        lnote = ttk.LabelFrame(master=self, text=" Notes ")
+        lnote.grid(column=0, row=1, rowspan=2, padx=5, pady=5, ipadx=5, ipady=5)
+
+        # date
+        cal = Calendar(master=ldate)
+        cal.pack(side=TkPack.Side.TOP)
+
+        # elapsed time
+
+        # notes
 
 
 class AddDataDialog(BData, TtkBase, tk.Toplevel):
@@ -77,7 +111,7 @@ class AddDataDialog(BData, TtkBase, tk.Toplevel):
         # ttk.Spinbox
 
         # data frame
-        data_frame = ttk.Frame(self)
+        data_frame = DataFrame(self)
         data_frame.pack(side=TkPack.Side.TOP, fill=TkPack.Fill.BOTH, expand=True)
 
         # separator
