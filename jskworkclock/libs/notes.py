@@ -50,8 +50,14 @@ class NotesDialog(BData, TtkBase, tk.Toplevel):
 
         # init locals
         self._data[Keys.DIALOG_RETURN] = None
+        self._data[Keys.TEXT] = ""
 
         self.__init_ui()
+
+        # modal?
+        # self.root.wait_visibility()
+        self.grab_set()
+        # self.root.transient(parent)
 
     def __init_ui(self) -> None:
         """Create user interface."""
@@ -87,20 +93,17 @@ class NotesDialog(BData, TtkBase, tk.Toplevel):
         ok_button = ttk.Button(bt_frame, text="Ok", command=self.__bt_ok)
         ok_button.pack(side=TkPack.Side.RIGHT, padx=2)
 
-        # modal?
-        # self.root.wait_visibility()
-        self.grab_set()
-        # self.root.transient(parent)
-
     def __bt_ok(self) -> None:
         """Button OK handler."""
         self._data[Keys.DIALOG_RETURN] = True
-        self.withdraw()
+        notes: tk.Text = self._data[Keys.DNOTES]
+        self._data[Keys.TEXT] = notes.get(1.0, tk.END)
+        self.destroy()
 
     def __bt_close(self) -> None:
         """Button CLOSE handler."""
         self._data[Keys.DIALOG_RETURN] = False
-        self.withdraw()
+        self.destroy()
 
     @property
     def dialog_return(self) -> Optional[bool]:
@@ -110,9 +113,7 @@ class NotesDialog(BData, TtkBase, tk.Toplevel):
     @property
     def get_notes(self) -> str:
         """Returns notes text."""
-        notes: tk.Text = self._data[Keys.DNOTES]
-        text: str = notes.get(1.0, tk.END)
-        return text
+        return self._data[Keys.TEXT]
 
 
 # #[EOF]#######################################################################

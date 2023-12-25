@@ -42,8 +42,82 @@ from libs.base import BDbHandler
 from libs.heper import TkPack
 
 
+class AddDataDialog(BData, TtkBase, tk.Toplevel):
+    """Modal Dialog Box."""
+
+    def __init__(self, parent: tk.Toplevel, *args) -> None:
+        """Constructor."""
+        tk.Toplevel.__init__(self, parent, *args)
+        self.title(f"{parent.title()}: Add Record")
+
+        # bind events
+        self.protocol("WM_DELETE_WINDOW", self.__bt_close)
+
+        # init locals
+        self._data[Keys.WCLOSED] = False
+        self._data[Keys.DIALOG_RETURN] = None
+
+        self.__init_ui()
+
+        # modal?
+        # self.root.wait_visibility()
+        self.grab_set()
+        # self.root.transient(parent)
+
+    def __init_ui(self) -> None:
+        """Create user interface."""
+        # main window
+        self.geometry("400x300")
+        # self.resizable(False, False)
+
+        ico = tk.PhotoImage(data=ImageBase64.ICO)
+        self.wm_iconphoto(False, ico)
+
+        # content
+        # ttk.Spinbox
+
+        # data frame
+        data_frame = ttk.Frame(self)
+        data_frame.pack(side=TkPack.Side.TOP, fill=TkPack.Fill.BOTH, expand=True)
+
+        # separator
+        sep = ttk.Separator(self, orient=tk.HORIZONTAL)
+        sep.pack(fill=TkPack.Fill.X)
+
+        # button frame
+        # add button frame
+        bt_frame = ttk.Frame(self)
+        bt_frame.pack(side=TkPack.Side.TOP, fill=TkPack.Fill.X, padx=5, pady=5)
+        # add close button
+        close_button = ttk.Button(bt_frame, text="Close", command=self.__bt_close)
+        close_button.pack(side=TkPack.Side.RIGHT, padx=2)
+        # add ok buton
+        ok_button = ttk.Button(bt_frame, text="Ok", command=self.__bt_ok)
+        ok_button.pack(side=TkPack.Side.RIGHT, padx=2)
+
+    def __bt_ok(self) -> None:
+        """Button OK handler."""
+        self._data[Keys.DIALOG_RETURN] = True
+        self.destroy()
+
+    def __bt_close(self) -> None:
+        """Button 'Close' Event."""
+        self._data[Keys.DIALOG_RETURN] = False
+        self.destroy()
+
+    @property
+    def dialog_return(self) -> Optional[bool]:
+        """Returns notes dialog decision."""
+        return self._data[Keys.DIALOG_RETURN]
+
+    @property
+    def dialog_data(self) -> str:
+        """The dialog_data property."""
+        return "test"
+
+
 class ReportDialog(TtkBase, BDbHandler, tk.Toplevel):
-    """Modal Dailog box."""
+    """Dailog box."""
 
     def __init__(self, parent: tk.Tk, dbh: Database, *args) -> None:
         """Constructor."""
@@ -132,7 +206,8 @@ class ReportDialog(TtkBase, BDbHandler, tk.Toplevel):
 
     def __bt_add(self) -> None:
         """Button 'Add Data' Event."""
-        pass
+        dialog = AddDataDialog(self)
+        dialog.wait_window()
 
     def __bt_save(self) -> None:
         """Button 'Save' Event."""

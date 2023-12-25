@@ -99,13 +99,11 @@ class MainFrame(TtkBase, BDbHandler, ttk.Frame):
         self._data[Keys.BTSTOP][Keys.STATE] = tk.DISABLED
         # raise message box for notes
         dialog = NotesDialog(self.master)
-        while dialog.dialog_return is None:
-            sleep(0.2)
+        dialog.wait_window()
         # get dialog data
         if dialog.dialog_return:
             notes = dialog.get_notes
-        # destroy dialog
-        dialog.destroy()
+        del dialog
         dialog = None
         # insert data to database
         session = self._db_handler.session

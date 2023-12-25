@@ -23,9 +23,10 @@ class Keys(object, metaclass=ReadOnlyClass):
     DNOTES = "__dialog_notes__"
     FSTOP = "__stop__"
     STATE = "state"
+    TEXT = "__text__"
     THCLOCK = "__thclock__"
-    WREPORT = "__report_window__"
     WCLOSED = "__wm_closed__"
+    WREPORT = "__report_window__"
 
 
 # #[EOF]#######################################################################
