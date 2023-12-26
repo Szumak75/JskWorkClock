@@ -371,6 +371,7 @@ class ReportDialog(TtkBase, BDbHandler, tk.Toplevel):
         row = (
             session.query(func.sum(TWorkTime.duration))
             .filter(TWorkTime.start < bmonth)
+            .order_by(TWorkTime.start)
             .first()
         )
         if row and row[0] is not None:
@@ -387,7 +388,7 @@ class ReportDialog(TtkBase, BDbHandler, tk.Toplevel):
         dataset: List[TWorkTime] = (
             session.query(TWorkTime)
             .filter(TWorkTime.start > bmonth)
-            .order_by(TWorkTime.id)
+            .order_by(TWorkTime.start)
             .all()
         )
         for item in dataset:
