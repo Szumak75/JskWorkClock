@@ -61,7 +61,7 @@ class NotesDialog(BData, TtkBase, tk.Toplevel):
 
     def __init_ui(self) -> None:
         """Create user interface."""
-        self.geometry("400x300")
+        self.geometry("500x400")
         self.resizable(True, True)
 
         ico = tk.PhotoImage(data=ImageBase64.ICO)
@@ -94,6 +94,7 @@ class NotesDialog(BData, TtkBase, tk.Toplevel):
         # add ok buton
         ok_button = ttk.Button(bt_frame, text="Ok", command=self.__bt_ok)
         ok_button.pack(side=TkPack.Side.RIGHT, padx=2)
+        self.update()
 
     def __bt_ok(self) -> None:
         """Button OK handler."""

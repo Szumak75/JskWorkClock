@@ -11,6 +11,7 @@
 """
 
 
+from calendar import month
 import os
 import tkinter as tk
 
@@ -23,12 +24,12 @@ from PIL import Image, ImageDraw
 from time import sleep
 from threading import Thread
 from inspect import currentframe
-from datetime import timedelta, datetime
+from datetime import timedelta, datetime, date
 
 from tkcalendar import Calendar
 
 from sqlalchemy.orm import Session
-from sqlalchemy.sql import func
+from sqlalchemy.sql import func, and_
 
 from jsktoolbox.libs.base_data import BData
 from jsktoolbox.datetool import DateTime, Timestamp
@@ -154,6 +155,7 @@ class AddDataDialog(BData, TtkBase, tk.Toplevel):
         # init locals
         self._data[Keys.WCLOSED] = False
         self._data[Keys.DIALOG_RETURN] = None
+        self._data[Keys.DDATA] = None
 
         self.__init_ui()
 
@@ -166,7 +168,6 @@ class AddDataDialog(BData, TtkBase, tk.Toplevel):
         """Create user interface."""
         # main window
         # self.geometry("400x300")
-        self.update()
         self.resizable(False, False)
 
         ico = tk.PhotoImage(data=ImageBase64.ICO)
@@ -194,11 +195,12 @@ class AddDataDialog(BData, TtkBase, tk.Toplevel):
         # add ok buton
         ok_button = ttk.Button(bt_frame, text="Ok", command=self.__bt_ok)
         ok_button.pack(side=TkPack.Side.RIGHT, padx=2)
+        self.update()
 
     def __bt_ok(self) -> None:
         """Button OK handler."""
         self._data[Keys.DIALOG_RETURN] = True
-        print(self._data[Keys.DFRAME].get_variables)
+        self._data[Keys.DDATA] = self._data[Keys.DFRAME].get_variables
         self.destroy()
 
     def __bt_close(self) -> None:
@@ -212,9 +214,9 @@ class AddDataDialog(BData, TtkBase, tk.Toplevel):
         return self._data[Keys.DIALOG_RETURN]
 
     @property
-    def dialog_data(self) -> str:
+    def dialog_data(self) -> Optional[Tuple]:
         """The dialog_data property."""
-        return "test"
+        return self._data[Keys.DDATA]
 
 
 class ReportDialog(TtkBase, BDbHandler, tk.Toplevel):
@@ -311,10 +313,37 @@ class ReportDialog(TtkBase, BDbHandler, tk.Toplevel):
         """Button 'Add Data' Event."""
         dialog = AddDataDialog(self)
         dialog.wait_window()
+        if dialog.dialog_return == True:
+            if dialog.dialog_data:
+                # add record
+                self.__add_record(dialog.dialog_data)
+        dialog.destroy()
 
     def __bt_save(self) -> None:
         """Button 'Save' Event."""
         pass
+
+    def __add_record(self, arg: Tuple) -> None:
+        print(arg)
+        rdate: date = arg[0]
+        ropr: str = arg[1]
+        rhour: float = arg[2]
+        rminute: float = arg[3]
+        rnote: str = arg[4]
+
+        rec = TWorkTime()
+        rec.start = int(
+            datetime(year=rdate.year, month=rdate.month, day=rdate.day).timestamp()
+        )
+        multi: Literal[-1, 1] = -1 if ropr == "-" else 1
+        rec.duration = int(multi * (rhour * 3600 + rminute * 60))
+        rec.notes = rnote.strip("\n")
+        session: Session | None = self._db_handler.session
+        if session:
+            print(rec)
+            session.add(rec)
+            session.commit()
+            session.close()
 
     def __get_data(self):  # -> tuple[Any, ...]:
         session: Session | None = self._db_handler.session
@@ -323,7 +352,11 @@ class ReportDialog(TtkBase, BDbHandler, tk.Toplevel):
             return tuple()
 
         # cleanup garbage
-        dataset = session.query(TWorkTime).filter(TWorkTime.duration <= 120).all()
+        dataset = (
+            session.query(TWorkTime)
+            .filter(and_(TWorkTime.duration <= 120, TWorkTime.duration >= -120))
+            .all()
+        )
         for item in dataset:
             session.delete(item)
         if dataset:
@@ -359,9 +392,10 @@ class ReportDialog(TtkBase, BDbHandler, tk.Toplevel):
         )
         for item in dataset:
             idate: datetime = DateTime.datetime_from_timestamp(item.start)
-            idur: timedelta = DateTime.elapsed_time_from_seconds(item.duration)
+            idur: timedelta = DateTime.elapsed_time_from_seconds(abs(item.duration))
+            opr: Literal["-", ""] = "-" if item.duration < 0 else ""
             dsum += item.duration
-            out.append((idate, idur, item.notes))
+            out.append((idate, f"{opr}{idur}", item.notes))
 
         if dataset:
             out.append(

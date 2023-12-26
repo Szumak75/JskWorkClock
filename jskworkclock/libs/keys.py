@@ -19,6 +19,7 @@ class Keys(object, metaclass=ReadOnlyClass):
     DATABASE = "__dbase__"
     DBH = "_DBH_"
     DCALENDAR = "__dialog_calendar__"
+    DDATA = "__dialog_return_data__"
     DEFNAME = "__dname__"
     DFRAME = "__dialog_data_frame__"
     DHOUR = "__dialog_hour__"

@@ -58,13 +58,13 @@ class MainFrame(TtkBase, BDbHandler, ttk.Frame):
     def __init_ui(self) -> None:
         """Initialize GUI."""
         self._data[Keys.BTSTART] = ttk.Button(
-            self, text="Start", command=self.__bt_start
+            self, text="Start", command=self.__bt_start, width=15
         )
         self._data[Keys.BTSTART].pack(
             side=TkPack.Side.LEFT, expand=True, fill=TkPack.Fill.BOTH, padx=4, pady=4
         )
         self._data[Keys.BTSTOP] = ttk.Button(
-            self, text="Stop", command=self.__bt_stop, state=tk.DISABLED
+            self, text="Stop", command=self.__bt_stop, width=15, state=tk.DISABLED
         )
         self._data[Keys.BTSTOP].pack(
             side=TkPack.Side.RIGHT, expand=True, fill=TkPack.Fill.BOTH, padx=4, pady=4
@@ -180,7 +180,6 @@ class WorkClock(TkBase, BDbHandler, tk.Tk):
         # init window
         self.title("Working Time")
         # self.geometry("300x40")
-        self.update()
         self.resizable(False, False)
         ico = tk.PhotoImage(data=ImageBase64.ICO)
         self.wm_iconphoto(False, ico)
@@ -207,6 +206,7 @@ class WorkClock(TkBase, BDbHandler, tk.Tk):
         menubar.add_cascade(label="Help", menu=helpmenu)
 
         self.config(menu=menubar)
+        self.update()
 
     def __quit_window(self) -> None:
         """Quit sequence."""
