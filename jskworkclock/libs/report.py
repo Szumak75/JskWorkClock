@@ -15,9 +15,10 @@ import os
 import tkinter as tk
 
 from tkinter import ttk
+from tkinter.scrolledtext import ScrolledText
 from time import sleep
 from turtle import heading
-from typing import Optional, Literal, List, Tuple
+from typing import Optional, Literal, List, Tuple, Any
 from PIL import Image, ImageDraw
 from time import sleep
 from threading import Thread
@@ -59,21 +60,84 @@ class DataFrame(BData, TtkBase, ttk.Frame):
 
         # labels
         ldate = ttk.LabelFrame(master=self, text=" Date ")
-        ldate.grid(column=0, row=0, padx=5, pady=5, ipadx=5, ipady=5)
+        ldate.grid(
+            column=0, row=0, sticky=TkGrid.Sticky.N, padx=5, pady=5, ipadx=5, ipady=5
+        )
 
         ltime = ttk.LabelFrame(master=self, text=" Elapsed time ")
-        ltime.grid(column=1, row=0, padx=5, pady=5, ipadx=5, ipady=5)
+        ltime.grid(
+            column=1, row=0, sticky=TkGrid.Sticky.N, padx=5, pady=5, ipadx=5, ipady=5
+        )
 
         lnote = ttk.LabelFrame(master=self, text=" Notes ")
-        lnote.grid(column=0, row=1, rowspan=2, padx=5, pady=5, ipadx=5, ipady=5)
+        lnote.grid(
+            column=0,
+            row=10,
+            sticky=TkGrid.Sticky.N,
+            columnspan=2,
+            padx=5,
+            pady=5,
+            ipadx=5,
+            ipady=5,
+        )
 
         # date
         cal = Calendar(master=ldate)
         cal.pack(side=TkPack.Side.TOP)
+        self._data[Keys.DCALENDAR] = cal
+        print(cal.selection_get())
 
         # elapsed time
+        self._data[Keys.DRADIO] = tk.StringVar()
+        oprs: tuple[
+            tuple[Literal["Add"], Literal["+"]],
+            tuple[Literal["Subtract"], Literal["-"]],
+        ] = (("Add", "+"), ("Subtract", "-"))
+        for opr in oprs:
+            ttk.Radiobutton(
+                ltime, text=opr[0], value=opr[1], variable=self._data[Keys.DRADIO]
+            ).pack(side=TkPack.Side.TOP, fill=TkPack.Fill.X, padx=5, pady=2)
+        self._data[Keys.DRADIO].set("+")
+        self._data[Keys.DHOUR] = tk.DoubleVar(value=0)
+        hour = ttk.Spinbox(
+            ltime,
+            from_=0,
+            to=23,
+            textvariable=self._data[Keys.DHOUR],
+            width=10,
+            wrap=True,
+            state="readonly",
+        )
+        self._data[Keys.DHOUR].set(0)
+        hour.pack(side=TkPack.Side.TOP, fill=TkPack.Fill.X, padx=5, pady=5)
+        self._data[Keys.DMINUTE] = tk.DoubleVar(value=0)
+        minute = ttk.Spinbox(
+            ltime,
+            from_=0,
+            to=59,
+            textvariable=self._data[Keys.DMINUTE],
+            width=10,
+            wrap=True,
+            state="readonly",
+        )
+        self._data[Keys.DMINUTE].set(0)
+        minute.pack(side=TkPack.Side.TOP, fill=TkPack.Fill.X, padx=5, pady=5)
 
         # notes
+        notes = ScrolledText(lnote, width=46, height=8)
+        self._data[Keys.DNOTES] = notes
+        notes.pack(side=TkPack.Side.LEFT, fill=TkPack.Fill.BOTH, expand=True)
+
+    @property
+    def get_variables(self) -> tuple[Any, Any, Any, Any, Any]:
+        """The get property."""
+        return (
+            self._data[Keys.DCALENDAR].selection_get(),
+            self._data[Keys.DRADIO].get(),
+            self._data[Keys.DHOUR].get(),
+            self._data[Keys.DMINUTE].get(),
+            self._data[Keys.DNOTES].get(1.0, tk.END),
+        )
 
 
 class AddDataDialog(BData, TtkBase, tk.Toplevel):
@@ -101,8 +165,9 @@ class AddDataDialog(BData, TtkBase, tk.Toplevel):
     def __init_ui(self) -> None:
         """Create user interface."""
         # main window
-        self.geometry("400x300")
-        # self.resizable(False, False)
+        # self.geometry("400x300")
+        self.update()
+        self.resizable(False, False)
 
         ico = tk.PhotoImage(data=ImageBase64.ICO)
         self.wm_iconphoto(False, ico)
@@ -113,6 +178,7 @@ class AddDataDialog(BData, TtkBase, tk.Toplevel):
         # data frame
         data_frame = DataFrame(self)
         data_frame.pack(side=TkPack.Side.TOP, fill=TkPack.Fill.BOTH, expand=True)
+        self._data[Keys.DFRAME] = data_frame
 
         # separator
         sep = ttk.Separator(self, orient=tk.HORIZONTAL)
@@ -132,6 +198,7 @@ class AddDataDialog(BData, TtkBase, tk.Toplevel):
     def __bt_ok(self) -> None:
         """Button OK handler."""
         self._data[Keys.DIALOG_RETURN] = True
+        print(self._data[Keys.DFRAME].get_variables)
         self.destroy()
 
     def __bt_close(self) -> None:
@@ -182,7 +249,9 @@ class ReportDialog(TtkBase, BDbHandler, tk.Toplevel):
 
         # Data Frame
         data_frame = ttk.Frame(self)
-        data_frame.pack(side=TkPack.Side.TOP, expand=True, fill=TkPack.Fill.BOTH)
+        data_frame.pack(
+            side=TkPack.Side.TOP, expand=True, fill=TkPack.Fill.BOTH, padx=5, pady=5
+        )
 
         # treeview
         columns: tuple[Literal["date"], Literal["elapsed_time"], Literal["note"]] = (

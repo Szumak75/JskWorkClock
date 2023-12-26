@@ -179,7 +179,8 @@ class WorkClock(TkBase, BDbHandler, tk.Tk):
         """Initialize GUI."""
         # init window
         self.title("Working Time")
-        self.geometry("300x40")
+        # self.geometry("300x40")
+        self.update()
         self.resizable(False, False)
         ico = tk.PhotoImage(data=ImageBase64.ICO)
         self.wm_iconphoto(False, ico)

@@ -73,7 +73,9 @@ class NotesDialog(BData, TtkBase, tk.Toplevel):
 
         # add frame
         notes_frame = ttk.Frame(self)
-        notes_frame.pack(side=TkPack.Side.TOP, fill=TkPack.Fill.BOTH, expand=True)
+        notes_frame.pack(
+            side=TkPack.Side.TOP, fill=TkPack.Fill.BOTH, padx=5, pady=5, expand=True
+        )
         # add entry
         notes = ScrolledText(notes_frame, width=50, height=10)
         self._data[Keys.DNOTES] = notes
