@@ -27,6 +27,7 @@ class Keys(object, metaclass=ReadOnlyClass):
     DMINUTE = "__dialog_minute__"
     DNOTES = "__dialog_notes__"
     DRADIO = "__dialog_radio_buttons__"
+    DREPORT = "__report_tree__"
     FSTOP = "__stop__"
     STATE = "state"
     TEXT = "__text__"

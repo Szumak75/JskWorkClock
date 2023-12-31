@@ -19,6 +19,7 @@ class TkBase(BClasses):
     """Base class for classess derived from Tk."""
 
     _tkloaded = None
+    _windowingsystem_cached = None
     child = None
     children = None
     master = None

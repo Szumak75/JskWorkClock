@@ -22,7 +22,7 @@ from time import sleep
 from threading import Thread
 from inspect import currentframe
 from datetime import timedelta
-
+from l10n import Locales
 from jsktoolbox.libs.base_data import BData
 from jsktoolbox.datetool import DateTime, Timestamp
 from jsktoolbox.attribtool import ReadOnlyClass
@@ -37,6 +37,7 @@ from libs.keys import Keys
 from libs.notes import NotesDialog
 from libs.report import ReportDialog
 from libs.heper import TkPack
+from libs.system import Translate
 
 
 class MainFrame(TtkBase, BDbHandler, ttk.Frame):
@@ -57,8 +58,13 @@ class MainFrame(TtkBase, BDbHandler, ttk.Frame):
 
     def __init_ui(self) -> None:
         """Initialize GUI."""
+        # loc = Translate()
         self._data[Keys.BTSTART] = ttk.Button(
-            self, text="Start", command=self.__bt_start, width=15
+            # self, text=loc.get("Start"), command=self.__bt_start, width=15
+            self,
+            text="Start",
+            command=self.__bt_start,
+            width=15,
         )
         self._data[Keys.BTSTART].pack(
             side=TkPack.Side.LEFT, expand=True, fill=TkPack.Fill.BOTH, padx=4, pady=4

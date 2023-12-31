@@ -17,6 +17,9 @@ import tkinter as tk
 
 from tkinter import ttk
 from tkinter.scrolledtext import ScrolledText
+from tkinter.filedialog import SaveFileDialog
+from tkinter.filedialog import asksaveasfile
+
 from time import sleep
 from turtle import heading
 from typing import Optional, Literal, List, Tuple, Any
@@ -44,6 +47,7 @@ from libs.database import Database, TWorkTime
 from libs.keys import Keys
 from libs.base import BDbHandler
 from libs.heper import TkGrid, TkPack
+from libs.system import MDateTime
 
 
 class DataFrame(BData, TtkBase, ttk.Frame):
@@ -270,6 +274,7 @@ class ReportDialog(TtkBase, BDbHandler, tk.Toplevel):
         tree.column(columns[2], minwidth=0, width=400)
 
         tree.pack(side=TkPack.Side.LEFT, fill=TkPack.Fill.BOTH, expand=True)
+        self._data[Keys.DREPORT] = tree
 
         # add a scrollbar
         scrollbar = ttk.Scrollbar(data_frame, orient=tk.VERTICAL, command=tree.yview)
@@ -321,7 +326,25 @@ class ReportDialog(TtkBase, BDbHandler, tk.Toplevel):
 
     def __bt_save(self) -> None:
         """Button 'Save' Event."""
-        pass
+        # sfd = SaveFileDialog(master=self)
+        file = asksaveasfile(
+            parent=self,
+            initialfile=f"Report-{MDateTime.short_date}.txt",
+            defaultextension=".txt",
+            filetypes=[("All Files", "*.*"), ("Text Documents", "*.txt")],
+            initialdir=Env.home,
+        )
+        self.focus()
+        if file is not None:
+            print(file)
+            tree: ttk.Treeview = self._data[Keys.DREPORT]
+            for child in tree.get_children():
+                ldata: List = tree.item(child)["values"]  # type: ignore
+                start = ldata[0]
+                duration = ldata[1]
+                notes = ldata[2]
+                file.write(f"{start}\t{duration}\t{notes}\n")
+            file.close()
 
     def __add_record(self, arg: Tuple) -> None:
         print(arg)
