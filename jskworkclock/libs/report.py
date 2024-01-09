@@ -269,7 +269,7 @@ class ReportDialog(TtkBase, BDbHandler, tk.Toplevel):
         tree.heading(columns[0], text="Date")
         tree.column(columns[0], minwidth=0, width=150, stretch=False)
         tree.heading(columns[1], text="Elapsed time")
-        tree.column(columns[1], minwidth=0, width=100, stretch=False)
+        tree.column(columns[1], minwidth=0, width=120, stretch=False)
         tree.heading(columns[2], text="Note")
         tree.column(columns[2], minwidth=0, width=400)
 
@@ -402,7 +402,9 @@ class ReportDialog(TtkBase, BDbHandler, tk.Toplevel):
             out.append(
                 (
                     DateTime.datetime_from_timestamp(bmonth),
-                    DateTime.elapsed_time_from_seconds(dsum),
+                    self.__format_time(
+                        DateTime.elapsed_time_from_seconds(dsum).total_seconds()
+                    ),
                     "Balance of the previous month",
                 )
             )
@@ -425,13 +427,21 @@ class ReportDialog(TtkBase, BDbHandler, tk.Toplevel):
             out.append(
                 (
                     DateTime.datetime_from_timestamp(Timestamp.now),
-                    DateTime.elapsed_time_from_seconds(dsum),
+                    self.__format_time(
+                        DateTime.elapsed_time_from_seconds(dsum).total_seconds()
+                    ),
                     "Current Balance",
                 )
             )
 
         session.close()
         return tuple(out)
+
+    def __format_time(self, total_seconds: float) -> str:
+        """Returns formated time string."""
+        hours, reminder = divmod(total_seconds, 3600)
+        minutes, seconds = divmod(reminder, 60)
+        return f"{int(hours):02}:{int(minutes):02}:{int(seconds):02}"
 
     @property
     def is_closed(self) -> bool:
