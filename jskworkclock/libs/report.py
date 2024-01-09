@@ -347,6 +347,7 @@ class ReportDialog(TtkBase, BDbHandler, tk.Toplevel):
             file.close()
 
     def __add_record(self, arg: Tuple) -> None:
+        """Add record to database."""
         print(arg)
         rdate: date = arg[0]
         ropr: str = arg[1]
@@ -369,6 +370,7 @@ class ReportDialog(TtkBase, BDbHandler, tk.Toplevel):
             session.close()
 
     def __get_data(self):  # -> tuple[Any, ...]:
+        """Gets data for reports."""
         session: Session | None = self._db_handler.session
 
         if session is None:
