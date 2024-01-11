@@ -80,7 +80,7 @@ class Database(BData):
                 echo=self._data[_Keys.DEBUG],
             )
         except Exception as ex:
-            raise Raise.error(f"{ex}", OSError, self._c_name, currentframe())  # type: ignore
+            raise Raise.error(f"{ex}", OSError, self._c_name, currentframe())
         if engine is not None:
             self._data[_Keys.DBH] = engine
             return True
@@ -95,7 +95,7 @@ class Database(BData):
         try:
             session = Session(bind=self._data[_Keys.DBH])
         except Exception as ex:
-            raise Raise.error(f"{ex}", OSError, self._c_name, currentframe())  # type: ignore
+            raise Raise.error(f"{ex}", OSError, self._c_name, currentframe())
         return session
 
 

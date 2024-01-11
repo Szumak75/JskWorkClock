@@ -162,7 +162,7 @@ class WorkClock(TkBase, BDbHandler, tk.Tk):
             self._db_handler = db
         else:
             raise Raise.error(
-                "Init database error.", OSError, self._c_name, currentframe()  # type: ignore
+                "Init database error.", OSError, self._c_name, currentframe()
             )
 
     def __init_dirs(self) -> None:
@@ -176,7 +176,7 @@ class WorkClock(TkBase, BDbHandler, tk.Tk):
             if not pc.create():
                 raise Raise.error(
                     f"Cannot create local database: '{tmp}'",
-                    OSError,  # type: ignore
+                    OSError,
                     self._c_name,
                     currentframe(),
                 )

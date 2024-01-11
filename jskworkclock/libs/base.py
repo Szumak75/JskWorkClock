@@ -52,7 +52,7 @@ class BDbHandler(BData):
         if not isinstance(value, Database):
             raise Raise.error(
                 f"Expected Database type, received '{type(value)}'.",
-                TypeError,  # type: ignore
+                TypeError,
                 self._c_name,
                 currentframe(),
             )
