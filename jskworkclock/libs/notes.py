@@ -66,7 +66,7 @@ class NotesDialog(BData, TkBase, tk.Toplevel):
         self.resizable(True, True)
 
         ico = tk.PhotoImage(data=ImageBase64.ICO)
-        self.wm_iconphoto(False, ico)
+        self.wm_iconphoto(True, ico)
 
         # Sizegrip
         sizegrip = ttk.Sizegrip(self)

@@ -189,7 +189,7 @@ class WorkClock(tk.Tk, TkBase, BDbHandler):
         # self.geometry("300x40")
         self.resizable(False, False)
         ico = tk.PhotoImage(data=ImageBase64.ICO)
-        self.wm_iconphoto(False, ico)
+        self.wm_iconphoto(True, ico)
 
         self.protocol("WM_DELETE_WINDOW", self.__quit_window)
 

@@ -89,7 +89,7 @@ class DataFrame(BData, TkBase, ttk.Frame):
         cal = Calendar(master=ldate)
         cal.pack(side=Pack.Side.TOP)
         self._data[Keys.DCALENDAR] = cal
-        print(cal.selection_get())
+        # print(cal.selection_get())
 
         # elapsed time
         self._data[Keys.DRADIO] = tk.StringVar()
@@ -175,7 +175,7 @@ class AddDataDialog(BData, TkBase, tk.Toplevel):
         self.resizable(False, False)
 
         ico = tk.PhotoImage(data=ImageBase64.ICO)
-        self.wm_iconphoto(False, ico)
+        self.wm_iconphoto(True, ico)
 
         # content
         # ttk.Spinbox
@@ -245,7 +245,7 @@ class ReportDialog(TkBase, BDbHandler, tk.Toplevel):
         self.geometry("700x600")
 
         ico = tk.PhotoImage(data=ImageBase64.ICO)
-        self.wm_iconphoto(False, ico)
+        self.wm_iconphoto(True, ico)
 
         self.protocol("WM_DELETE_WINDOW", self.__on_closing)
 
@@ -338,7 +338,6 @@ class ReportDialog(TkBase, BDbHandler, tk.Toplevel):
         )
         self.focus()
         if file is not None:
-            print(file)
             tree: ttk.Treeview = self._data[Keys.DREPORT]
             for child in tree.get_children():
                 ldata: List = tree.item(child)["values"]  # type: ignore
@@ -350,7 +349,6 @@ class ReportDialog(TkBase, BDbHandler, tk.Toplevel):
 
     def __add_record(self, arg: Tuple) -> None:
         """Add record to database."""
-        print(arg)
         rdate: date = arg[0]
         ropr: str = arg[1]
         rhour: float = arg[2]
@@ -364,16 +362,15 @@ class ReportDialog(TkBase, BDbHandler, tk.Toplevel):
         multi: Literal[-1, 1] = -1 if ropr == "-" else 1
         rec.duration = int(multi * (rhour * 3600 + rminute * 60))
         rec.notes = rnote.strip("\n")
-        session: Session | None = self._db_handler.session
+        session: Optional[Session] = self._db_handler.session
         if session:
-            print(rec)
             session.add(rec)
             session.commit()
             session.close()
 
     def __get_data(self):  # -> tuple[Any, ...]:
         """Gets data for reports."""
-        session: Session | None = self._db_handler.session
+        session: Optional[Session] = self._db_handler.session
 
         if session is None:
             return tuple()
