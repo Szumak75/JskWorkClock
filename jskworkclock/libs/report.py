@@ -39,22 +39,21 @@ from jsktoolbox.datetool import DateTime, Timestamp
 from jsktoolbox.attribtool import ReadOnlyClass
 from jsktoolbox.libs.system import PathChecker, Env
 from jsktoolbox.raisetool import Raise
+from jsktoolbox.tktool.layout import Grid, Pack
+from jsktoolbox.tktool.base import TkBase
 
-
-from libs.base import TkBase, TtkBase
 from libs.ico import ImageBase64
 from libs.database import Database, TWorkTime
 from libs.keys import Keys
 from libs.base import BDbHandler
-from libs.heper import TkGrid, TkPack
 from libs.system import MDateTime
 
 
-class DataFrame(BData, TtkBase, ttk.Frame):
+class DataFrame(BData, TkBase, ttk.Frame):
     """DataFrame for AddDataDialog."""
 
-    def __init__(self, parent, *args) -> None:
-        super().__init__(parent, *args)
+    def __init__(self, master, **args) -> None:
+        super().__init__(master, **args)
 
         # grid configure
         self.columnconfigure(0)
@@ -66,19 +65,19 @@ class DataFrame(BData, TtkBase, ttk.Frame):
         # labels
         ldate = ttk.LabelFrame(master=self, text=" Date ")
         ldate.grid(
-            column=0, row=0, sticky=TkGrid.Sticky.N, padx=5, pady=5, ipadx=5, ipady=5
+            column=0, row=0, sticky=Grid.Sticky.N, padx=5, pady=5, ipadx=5, ipady=5
         )
 
         ltime = ttk.LabelFrame(master=self, text=" Elapsed time ")
         ltime.grid(
-            column=1, row=0, sticky=TkGrid.Sticky.N, padx=5, pady=5, ipadx=5, ipady=5
+            column=1, row=0, sticky=Grid.Sticky.N, padx=5, pady=5, ipadx=5, ipady=5
         )
 
         lnote = ttk.LabelFrame(master=self, text=" Notes ")
         lnote.grid(
             column=0,
             row=10,
-            sticky=TkGrid.Sticky.N,
+            sticky=Grid.Sticky.N,
             columnspan=2,
             padx=5,
             pady=5,
@@ -88,7 +87,7 @@ class DataFrame(BData, TtkBase, ttk.Frame):
 
         # date
         cal = Calendar(master=ldate)
-        cal.pack(side=TkPack.Side.TOP)
+        cal.pack(side=Pack.Side.TOP)
         self._data[Keys.DCALENDAR] = cal
         print(cal.selection_get())
 
@@ -101,7 +100,7 @@ class DataFrame(BData, TtkBase, ttk.Frame):
         for opr in oprs:
             ttk.Radiobutton(
                 ltime, text=opr[0], value=opr[1], variable=self._data[Keys.DRADIO]
-            ).pack(side=TkPack.Side.TOP, fill=TkPack.Fill.X, padx=5, pady=2)
+            ).pack(side=Pack.Side.TOP, fill=Pack.Fill.X, padx=5, pady=2)
         self._data[Keys.DRADIO].set("+")
         self._data[Keys.DHOUR] = tk.DoubleVar(value=0)
         hour = ttk.Spinbox(
@@ -114,7 +113,7 @@ class DataFrame(BData, TtkBase, ttk.Frame):
             state="readonly",
         )
         self._data[Keys.DHOUR].set(0)
-        hour.pack(side=TkPack.Side.TOP, fill=TkPack.Fill.X, padx=5, pady=5)
+        hour.pack(side=Pack.Side.TOP, fill=Pack.Fill.X, padx=5, pady=5)
         self._data[Keys.DMINUTE] = tk.DoubleVar(value=0)
         minute = ttk.Spinbox(
             ltime,
@@ -126,12 +125,12 @@ class DataFrame(BData, TtkBase, ttk.Frame):
             state="readonly",
         )
         self._data[Keys.DMINUTE].set(0)
-        minute.pack(side=TkPack.Side.TOP, fill=TkPack.Fill.X, padx=5, pady=5)
+        minute.pack(side=Pack.Side.TOP, fill=Pack.Fill.X, padx=5, pady=5)
 
         # notes
         notes = ScrolledText(lnote, width=46, height=8)
         self._data[Keys.DNOTES] = notes
-        notes.pack(side=TkPack.Side.LEFT, fill=TkPack.Fill.BOTH, expand=True)
+        notes.pack(side=Pack.Side.LEFT, fill=Pack.Fill.BOTH, expand=True)
 
     @property
     def get_variables(self) -> tuple[Any, Any, Any, Any, Any]:
@@ -145,13 +144,14 @@ class DataFrame(BData, TtkBase, ttk.Frame):
         )
 
 
-class AddDataDialog(BData, TtkBase, tk.Toplevel):
+class AddDataDialog(BData, TkBase, tk.Toplevel):
     """Modal Dialog Box."""
 
-    def __init__(self, parent: tk.Toplevel, *args) -> None:
+    def __init__(self, master, **args) -> None:
         """Constructor."""
-        tk.Toplevel.__init__(self, parent, *args)
-        self.title(f"{parent.title()}: Add Record")
+        # tk.Toplevel.__init__(self, master, *args)
+        super().__init__(master, **args)
+        self.title(f"{master.title()}: Add Record")
 
         # bind events
         self.protocol("WM_DELETE_WINDOW", self.__bt_close)
@@ -182,23 +182,23 @@ class AddDataDialog(BData, TtkBase, tk.Toplevel):
 
         # data frame
         data_frame = DataFrame(self)
-        data_frame.pack(side=TkPack.Side.TOP, fill=TkPack.Fill.BOTH, expand=True)
+        data_frame.pack(side=Pack.Side.TOP, fill=Pack.Fill.BOTH, expand=True)
         self._data[Keys.DFRAME] = data_frame
 
         # separator
         sep = ttk.Separator(self, orient=tk.HORIZONTAL)
-        sep.pack(fill=TkPack.Fill.X)
+        sep.pack(fill=Pack.Fill.X)
 
         # button frame
         # add button frame
         bt_frame = ttk.Frame(self)
-        bt_frame.pack(side=TkPack.Side.TOP, fill=TkPack.Fill.X, padx=5, pady=5)
+        bt_frame.pack(side=Pack.Side.TOP, fill=Pack.Fill.X, padx=5, pady=5)
         # add close button
         close_button = ttk.Button(bt_frame, text="Close", command=self.__bt_close)
-        close_button.pack(side=TkPack.Side.RIGHT, padx=2)
+        close_button.pack(side=Pack.Side.RIGHT, padx=2)
         # add ok buton
         ok_button = ttk.Button(bt_frame, text="Ok", command=self.__bt_ok)
-        ok_button.pack(side=TkPack.Side.RIGHT, padx=2)
+        ok_button.pack(side=Pack.Side.RIGHT, padx=2)
         self.update()
 
     def __bt_ok(self) -> None:
@@ -223,13 +223,15 @@ class AddDataDialog(BData, TtkBase, tk.Toplevel):
         return self._data[Keys.DDATA]
 
 
-class ReportDialog(TtkBase, BDbHandler, tk.Toplevel):
+class ReportDialog(TkBase, BDbHandler, tk.Toplevel):
     """Dailog box."""
 
-    def __init__(self, parent: tk.Tk, dbh: Database, *args) -> None:
+    def __init__(self, master, dbh: Database, **args) -> None:
         """Constructor."""
-        tk.Toplevel.__init__(self, parent, *args)
-        self.title(f"{parent.title()}: Reports")
+        # tk.Toplevel.__init__(self, master, **args)
+        super().__init__(master, **args)
+        self.title(f"{master.title()}: Reports")
+        self.minsize(800, 500)
 
         # init locals
         self._data[Keys.WCLOSED] = False
@@ -251,12 +253,12 @@ class ReportDialog(TtkBase, BDbHandler, tk.Toplevel):
 
         # Sizegrip
         sizegrip = ttk.Sizegrip(self)
-        sizegrip.pack(side=TkPack.Side.BOTTOM, anchor=TkPack.Anchor.E)
+        sizegrip.pack(side=Pack.Side.BOTTOM, anchor=Pack.Anchor.E)
 
         # Data Frame
         data_frame = ttk.Frame(self)
         data_frame.pack(
-            side=TkPack.Side.TOP, expand=True, fill=TkPack.Fill.BOTH, padx=5, pady=5
+            side=Pack.Side.TOP, expand=True, fill=Pack.Fill.BOTH, padx=5, pady=5
         )
 
         # treeview
@@ -267,19 +269,19 @@ class ReportDialog(TtkBase, BDbHandler, tk.Toplevel):
         )
         tree = ttk.Treeview(data_frame, columns=columns, show="headings")
         tree.heading(columns[0], text="Date")
-        tree.column(columns[0], minwidth=0, width=150, stretch=False)
+        tree.column(columns[0], minwidth=0, width=200, stretch=False)
         tree.heading(columns[1], text="Elapsed time")
-        tree.column(columns[1], minwidth=0, width=120, stretch=False)
+        tree.column(columns[1], minwidth=0, width=160, stretch=False)
         tree.heading(columns[2], text="Note")
         tree.column(columns[2], minwidth=0, width=400)
 
-        tree.pack(side=TkPack.Side.LEFT, fill=TkPack.Fill.BOTH, expand=True)
+        tree.pack(side=Pack.Side.LEFT, fill=Pack.Fill.BOTH, expand=True)
         self._data[Keys.DREPORT] = tree
 
         # add a scrollbar
         scrollbar = ttk.Scrollbar(data_frame, orient=tk.VERTICAL, command=tree.yview)
         tree.configure(yscrollcommand=scrollbar.set)
-        scrollbar.pack(side=TkPack.Side.RIGHT, fill=TkPack.Fill.Y)
+        scrollbar.pack(side=Pack.Side.RIGHT, fill=Pack.Fill.Y)
 
         # tree data
         for item in self.__get_data():
@@ -287,23 +289,23 @@ class ReportDialog(TtkBase, BDbHandler, tk.Toplevel):
 
         # separator
         sep = ttk.Separator(self, orient=tk.HORIZONTAL)
-        sep.pack(fill=TkPack.Fill.X)
+        sep.pack(fill=Pack.Fill.X)
 
         # Button Frame
         bt_frame = ttk.Frame(self)
-        bt_frame.pack(side=TkPack.Side.TOP, fill=TkPack.Fill.X, padx=5, pady=5)
+        bt_frame.pack(side=Pack.Side.TOP, fill=Pack.Fill.X, padx=5, pady=5)
 
         # add close button
         close_button = ttk.Button(bt_frame, text="Close", command=self.__bt_close)
-        close_button.pack(side=TkPack.Side.RIGHT, padx=2)
+        close_button.pack(side=Pack.Side.RIGHT, padx=2)
 
         # add record button
         add_button = ttk.Button(bt_frame, text="Add Data", command=self.__bt_add)
-        add_button.pack(side=TkPack.Side.RIGHT, padx=2)
+        add_button.pack(side=Pack.Side.RIGHT, padx=2)
 
         # add save button
         save_button = ttk.Button(bt_frame, text="Save", command=self.__bt_save)
-        save_button.pack(side=TkPack.Side.RIGHT, padx=2)
+        save_button.pack(side=Pack.Side.RIGHT, padx=2)
 
     def __on_closing(self) -> None:
         """On Closing Event."""
@@ -441,6 +443,10 @@ class ReportDialog(TtkBase, BDbHandler, tk.Toplevel):
 
     def __format_time(self, total_seconds: float) -> str:
         """Returns formated time string."""
+        hours: float
+        reminder: float
+        minutes: float
+        seconds: float
         hours, reminder = divmod(total_seconds, 3600)
         minutes, seconds = divmod(reminder, 60)
         return f"{int(hours):02}:{int(minutes):02}:{int(seconds):02}"

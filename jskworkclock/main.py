@@ -28,28 +28,29 @@ from jsktoolbox.datetool import DateTime, Timestamp
 from jsktoolbox.attribtool import ReadOnlyClass
 from jsktoolbox.libs.system import PathChecker, Env
 from jsktoolbox.raisetool import Raise
+from jsktoolbox.tktool.base import TkBase
+from jsktoolbox.tktool.layout import Pack
+from sqlalchemy.orm import Session
 
-
-from libs.base import TkBase, TtkBase, BDbHandler
+from libs.base import BDbHandler
 from libs.ico import ImageBase64
 from libs.database import Database, TWorkTime
 from libs.keys import Keys
 from libs.notes import NotesDialog
 from libs.report import ReportDialog
-from libs.heper import TkPack
 from libs.system import Translate
 
 
-class MainFrame(TtkBase, BDbHandler, ttk.Frame):
+class MainFrame(TkBase, BDbHandler, ttk.Frame):
     """WorkClock main frame class."""
 
-    def __init__(self, parent: tk.Tk, dbh: Database) -> None:
+    def __init__(self, master, dbh: Database, **args) -> None:
         """Constructor."""
-        super().__init__(parent)
+        super().__init__(master, **args)
 
         # init locals
         self._data[Keys.FSTOP] = False
-        self._data[Keys.DEFNAME] = parent.title()
+        self._data[Keys.DEFNAME] = master.title()
         self._data[Keys.THCLOCK] = None
         self._db_handler = dbh
 
@@ -67,13 +68,13 @@ class MainFrame(TtkBase, BDbHandler, ttk.Frame):
             width=15,
         )
         self._data[Keys.BTSTART].pack(
-            side=TkPack.Side.LEFT, expand=True, fill=TkPack.Fill.BOTH, padx=4, pady=4
+            side=Pack.Side.LEFT, expand=True, fill=Pack.Fill.BOTH, padx=4, pady=4
         )
         self._data[Keys.BTSTOP] = ttk.Button(
             self, text="Stop", command=self.__bt_stop, width=15, state=tk.DISABLED
         )
         self._data[Keys.BTSTOP].pack(
-            side=TkPack.Side.RIGHT, expand=True, fill=TkPack.Fill.BOTH, padx=4, pady=4
+            side=Pack.Side.RIGHT, expand=True, fill=Pack.Fill.BOTH, padx=4, pady=4
         )
 
     def __bt_start(self) -> None:
@@ -113,7 +114,7 @@ class MainFrame(TtkBase, BDbHandler, ttk.Frame):
         del dialog
         dialog = None
         # insert data to database
-        session = self._db_handler.session
+        session: Optional[Session] = self._db_handler.session
         if session:
             obj = TWorkTime()
             obj.start = start
@@ -131,7 +132,7 @@ class MainFrame(TtkBase, BDbHandler, ttk.Frame):
         print(etime)
 
 
-class WorkClock(TkBase, BDbHandler, tk.Tk):
+class WorkClock(tk.Tk, TkBase, BDbHandler):
     """WorkClock main application class."""
 
     def __init__(self) -> None:
@@ -194,9 +195,7 @@ class WorkClock(TkBase, BDbHandler, tk.Tk):
 
         mf = MainFrame(self, self._db_handler)
         # mf.grid(column=0, row=0, sticky=tk.NSEW)
-        mf.pack(
-            side=TkPack.Side.TOP, fill=TkPack.Fill.BOTH, anchor=TkPack.Anchor.CENTER
-        )
+        mf.pack(side=Pack.Side.TOP, fill=Pack.Fill.BOTH, anchor=Pack.Anchor.CENTER)
 
         # menu
         menubar = tk.Menu(self)
@@ -228,7 +227,7 @@ class WorkClock(TkBase, BDbHandler, tk.Tk):
             if self._data[Keys.WREPORT] is not None:
                 del self._data[Keys.WREPORT]
                 self._data[Keys.WREPORT] = None
-            self._data[Keys.WREPORT] = ReportDialog(parent=self, dbh=self._db_handler)
+            self._data[Keys.WREPORT] = ReportDialog(master=self, dbh=self._db_handler)
 
 
 if __name__ == "__main__":

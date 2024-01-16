@@ -27,23 +27,24 @@ from jsktoolbox.datetool import DateTime, Timestamp
 from jsktoolbox.attribtool import ReadOnlyClass
 from jsktoolbox.libs.system import PathChecker, Env
 from jsktoolbox.raisetool import Raise
-from pytest import Session
-from jskworkclock.libs.heper import TkPack
+from jsktoolbox.tktool.base import TkBase
 
-from libs.base import TkBase, TtkBase
+
 from libs.ico import ImageBase64
 from libs.database import Database, TWorkTime
 from libs.keys import Keys
-from libs.heper import TkPack
+from jsktoolbox.tktool.layout import Pack
 
 
-class NotesDialog(BData, TtkBase, tk.Toplevel):
+class NotesDialog(BData, TkBase, tk.Toplevel):
     """Modal Dailog box."""
 
-    def __init__(self, parent, *args) -> None:
+    def __init__(self, master, **args) -> None:
         """Constructor."""
-        tk.Toplevel.__init__(self, parent, *args)
-        self.title(f"{parent.title()}: Notes")
+        # tk.Toplevel.__init__(self, parent, *args)
+        super().__init__(master, **args)
+        self.title(f"{master.title()}: Notes")
+        self.minsize(600, 400)
 
         # bind events
         self.protocol("WM_DELETE_WINDOW", self.__bt_close)
@@ -69,31 +70,31 @@ class NotesDialog(BData, TtkBase, tk.Toplevel):
 
         # Sizegrip
         sizegrip = ttk.Sizegrip(self)
-        sizegrip.pack(side=TkPack.Side.BOTTOM, anchor=TkPack.Anchor.E)
+        sizegrip.pack(side=Pack.Side.BOTTOM, anchor=Pack.Anchor.E)
 
         # add frame
         notes_frame = ttk.Frame(self)
         notes_frame.pack(
-            side=TkPack.Side.TOP, fill=TkPack.Fill.BOTH, padx=5, pady=5, expand=True
+            side=Pack.Side.TOP, fill=Pack.Fill.BOTH, padx=5, pady=5, expand=True
         )
         # add entry
         notes = ScrolledText(notes_frame, width=50, height=10)
         self._data[Keys.DNOTES] = notes
-        notes.pack(side=TkPack.Side.LEFT, fill=TkPack.Fill.BOTH, expand=True)
+        notes.pack(side=Pack.Side.LEFT, fill=Pack.Fill.BOTH, expand=True)
 
         # separator
         sep = ttk.Separator(self, orient=tk.HORIZONTAL)
-        sep.pack(fill=TkPack.Fill.X)
+        sep.pack(fill=Pack.Fill.X)
 
         # add button frame
         bt_frame = ttk.Frame(self)
-        bt_frame.pack(side=TkPack.Side.TOP, fill=TkPack.Fill.X, padx=5, pady=5)
+        bt_frame.pack(side=Pack.Side.TOP, fill=Pack.Fill.X, padx=5, pady=5)
         # add close button
         close_button = ttk.Button(bt_frame, text="Close", command=self.__bt_close)
-        close_button.pack(side=TkPack.Side.RIGHT, padx=2)
+        close_button.pack(side=Pack.Side.RIGHT, padx=2)
         # add ok buton
         ok_button = ttk.Button(bt_frame, text="Ok", command=self.__bt_ok)
-        ok_button.pack(side=TkPack.Side.RIGHT, padx=2)
+        ok_button.pack(side=Pack.Side.RIGHT, padx=2)
         self.update()
 
     def __bt_ok(self) -> None:

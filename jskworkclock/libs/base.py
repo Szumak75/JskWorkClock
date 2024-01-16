@@ -15,28 +15,6 @@ from libs.keys import Keys
 from libs.database import Database
 
 
-class TkBase(BClasses):
-    """Base class for classess derived from Tk."""
-
-    _tkloaded = None
-    _windowingsystem_cached = None
-    child = None
-    children = None
-    master = None
-    tk = None
-
-
-class TtkBase(BClasses):
-    """Base class for classess derived from Ttk."""
-
-    _name = None
-    _w = None
-    children = None
-    master = None
-    tk = None
-    widgetName = None
-
-
 class BDbHandler(BData):
     """BDbHandler base class."""
 
