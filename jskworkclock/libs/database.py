@@ -3,7 +3,7 @@
   Author:  Jacek 'Szumak' Kotlarski --<szumak@virthost.pl>
   Created: 11.12.2023
 
-  Purpose:
+  Purpose: database classes
 """
 
 from inspect import currentframe
@@ -31,7 +31,7 @@ from jsktoolbox.raisetool import Raise
 class _Keys(object, metaclass=ReadOnlyClass):
     """Local keys."""
 
-    DBPATH = "_db_path_"
+    DB_PATH = "_db_path_"
     DEBUG = "_debug_"
     DBH = "_db_handler_"
 
@@ -42,7 +42,7 @@ class LocalBase(DeclarativeBase):
 
 # db models
 class TWorkTime(LocalBase):
-    """Worktime table."""
+    """WorkTime table."""
 
     __tablename__: str = "worktime"
 
@@ -62,7 +62,7 @@ class Database(BData):
 
     def __init__(self, path: str, debug: bool = False) -> None:
         """Constructor."""
-        self._data[_Keys.DBPATH] = path
+        self._data[_Keys.DB_PATH] = path
         self._data[_Keys.DEBUG] = debug
         self._data[_Keys.DBH] = None
 
@@ -76,7 +76,7 @@ class Database(BData):
         engine: Optional[Engine] = None
         try:
             engine = create_engine(
-                f"sqlite:///{self._data[_Keys.DBPATH]}",
+                f"sqlite:///{self._data[_Keys.DB_PATH]}",
                 echo=self._data[_Keys.DEBUG],
             )
         except Exception as ex:

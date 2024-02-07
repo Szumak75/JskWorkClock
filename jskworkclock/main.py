@@ -4,7 +4,7 @@
   Author:  Jacek 'Szumak' Kotlarski --<szumak@virthost.pl>
   Created: 10.12.2023
 
-  Purpose:
+  Purpose: main project classes.
 
   https://www.pythontutorial.net/tkinter/tkinter-object-oriented-frame/
   https://ttkbootstrap.readthedocs.io/en/version-0.5/widgets/spinbox.html
@@ -49,9 +49,9 @@ class MainFrame(TkBase, BDbHandler, ttk.Frame):
         super().__init__(master, **args)
 
         # init locals
-        self._data[Keys.FSTOP] = False
-        self._data[Keys.DEFNAME] = master.title()
-        self._data[Keys.THCLOCK] = None
+        self._data[Keys.F_STOP] = False
+        self._data[Keys.DEF_NAME] = master.title()
+        self._data[Keys.TH_CLOCK] = None
         self._db_handler = dbh
 
         # init ui
@@ -60,51 +60,51 @@ class MainFrame(TkBase, BDbHandler, ttk.Frame):
     def __init_ui(self) -> None:
         """Initialize GUI."""
         # loc = Translate()
-        self._data[Keys.BTSTART] = ttk.Button(
+        self._data[Keys.BT_START] = ttk.Button(
             # self, text=loc.get("Start"), command=self.__bt_start, width=15
             self,
             text="Start",
             command=self.__bt_start,
             width=15,
         )
-        self._data[Keys.BTSTART].pack(
+        self._data[Keys.BT_START].pack(
             side=Pack.Side.LEFT, expand=True, fill=Pack.Fill.BOTH, padx=4, pady=4
         )
-        self._data[Keys.BTSTOP] = ttk.Button(
+        self._data[Keys.BT_STOP] = ttk.Button(
             self, text="Stop", command=self.__bt_stop, width=15, state=tk.DISABLED
         )
-        self._data[Keys.BTSTOP].pack(
+        self._data[Keys.BT_STOP].pack(
             side=Pack.Side.RIGHT, expand=True, fill=Pack.Fill.BOTH, padx=4, pady=4
         )
 
     def __bt_start(self) -> None:
         """[Start] click."""
-        self._data[Keys.FSTOP] = False
-        self._data[Keys.THCLOCK] = Thread(
+        self._data[Keys.F_STOP] = False
+        self._data[Keys.TH_CLOCK] = Thread(
             target=self.__th_worker, name="WorkingTime worker", daemon=True
         )
-        self._data[Keys.THCLOCK].start()
-        self._data[Keys.BTSTART][Keys.STATE] = tk.DISABLED
-        self._data[Keys.BTSTOP][Keys.STATE] = tk.NORMAL
+        self._data[Keys.TH_CLOCK].start()
+        self._data[Keys.BT_START][Keys.STATE] = tk.DISABLED
+        self._data[Keys.BT_STOP][Keys.STATE] = tk.NORMAL
 
     def __bt_stop(self) -> None:
         """[Stop] click."""
-        self._data[Keys.FSTOP] = True
+        self._data[Keys.F_STOP] = True
 
     def __th_worker(self) -> None:
         """Threaded worker."""
         notes: Optional[str] = None
-        etime: Optional[timedelta] = None
+        elapsed_time: Optional[timedelta] = None
         start: int = Timestamp.now
-        title: str = f"{self._data[Keys.DEFNAME]}"
-        while not self._data[Keys.FSTOP]:
-            etime = DateTime.elapsed_time_from_seconds(Timestamp.now - start)
+        title: str = f"{self._data[Keys.DEF_NAME]}"
+        while not self._data[Keys.F_STOP]:
+            elapsed_time = DateTime.elapsed_time_from_seconds(Timestamp.now - start)
             if self.master is not None:
-                self.master.title(f"{title}: {etime}")  # type: ignore
+                self.master.title(f"{title}: {elapsed_time}")  # type: ignore
             sleep(1)
 
-        self._data[Keys.BTSTART][Keys.STATE] = tk.NORMAL
-        self._data[Keys.BTSTOP][Keys.STATE] = tk.DISABLED
+        self._data[Keys.BT_START][Keys.STATE] = tk.NORMAL
+        self._data[Keys.BT_STOP][Keys.STATE] = tk.DISABLED
         # raise message box for notes
         dialog = NotesDialog(self.master)
         dialog.wait_window()
@@ -129,7 +129,7 @@ class MainFrame(TkBase, BDbHandler, ttk.Frame):
             session.commit()
             session.close()
 
-        print(etime)
+        print(elapsed_time)
 
 
 class WorkClock(tk.Tk, TkBase, BDbHandler):
@@ -140,8 +140,8 @@ class WorkClock(tk.Tk, TkBase, BDbHandler):
         super().__init__()
 
         # init locals
-        self._data[Keys.WREPORT] = None
-        self._data[Keys.CACHEDIR] = ".cache/jskworkclock"
+        self._data[Keys.W_REPORT] = None
+        self._data[Keys.CACHE_DIR] = ".cache/jskworkclock"
         self._data[Keys.DATABASE] = "data.sqlite"
 
         # init dirs
@@ -156,7 +156,7 @@ class WorkClock(tk.Tk, TkBase, BDbHandler):
     def __init_db(self) -> None:
         """Initialize database connection."""
         tmp: str = os.path.join(
-            Env.home, self._data[Keys.CACHEDIR], self._data[Keys.DATABASE]
+            Env.home, self._data[Keys.CACHE_DIR], self._data[Keys.DATABASE]
         )
         db = Database(tmp)
         if db is not None:
@@ -169,7 +169,7 @@ class WorkClock(tk.Tk, TkBase, BDbHandler):
     def __init_dirs(self) -> None:
         """Initialize local path for database."""
         tmp: str = os.path.join(
-            Env.home, self._data[Keys.CACHEDIR], self._data[Keys.DATABASE]
+            Env.home, self._data[Keys.CACHE_DIR], self._data[Keys.DATABASE]
         )
         # print(tmp)
         pc = PathChecker(tmp)
@@ -200,15 +200,15 @@ class WorkClock(tk.Tk, TkBase, BDbHandler):
         # menu
         menubar = tk.Menu(self)
         # File
-        filemenu = tk.Menu(menubar, tearoff=0)
-        filemenu.add_command(label="Report", command=self.__report)
-        filemenu.add_separator()
-        filemenu.add_command(label="Exit", command=self.__quit_window)
+        file_menu = tk.Menu(menubar, tearoff=0)
+        file_menu.add_command(label="Report", command=self.__report)
+        file_menu.add_separator()
+        file_menu.add_command(label="Exit", command=self.__quit_window)
         # Help
-        helpmenu = tk.Menu(menubar, tearoff=0)
-        helpmenu.add_command(label="About", command=self.__about)
-        menubar.add_cascade(label="File", menu=filemenu)
-        menubar.add_cascade(label="Help", menu=helpmenu)
+        help_menu = tk.Menu(menubar, tearoff=0)
+        help_menu.add_command(label="About", command=self.__about)
+        menubar.add_cascade(label="File", menu=file_menu)
+        menubar.add_cascade(label="Help", menu=help_menu)
 
         self.config(menu=menubar)
         self.update()
@@ -223,11 +223,11 @@ class WorkClock(tk.Tk, TkBase, BDbHandler):
 
     def __report(self) -> None:
         """Report dialog."""
-        if self._data[Keys.WREPORT] is None or self._data[Keys.WREPORT].is_closed:
-            if self._data[Keys.WREPORT] is not None:
-                del self._data[Keys.WREPORT]
-                self._data[Keys.WREPORT] = None
-            self._data[Keys.WREPORT] = ReportDialog(master=self, dbh=self._db_handler)
+        if self._data[Keys.W_REPORT] is None or self._data[Keys.W_REPORT].is_closed:
+            if self._data[Keys.W_REPORT] is not None:
+                del self._data[Keys.W_REPORT]
+                self._data[Keys.W_REPORT] = None
+            self._data[Keys.W_REPORT] = ReportDialog(master=self, dbh=self._db_handler)
 
 
 if __name__ == "__main__":

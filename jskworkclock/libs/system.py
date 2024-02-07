@@ -4,7 +4,7 @@
   Author : Jacek 'Szumak' Kotlarski --<szumak@virthost.pl>
   Created: 29.12.2023, 04:19:32
   
-  Purpose: 
+  Purpose: System interaction classes.
 """
 
 from datetime import datetime

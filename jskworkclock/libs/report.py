@@ -4,7 +4,7 @@
   Author : Jacek 'Szumak' Kotlarski --<szumak@virthost.pl>
   Created: 22.12.2023, 15:18:32
   
-  Purpose: 
+  Purpose: Classes for report dialog.
 
   Printers example
   https://gist.github.com/mutaku/1928574
@@ -63,18 +63,18 @@ class DataFrame(BData, TkBase, ttk.Frame):
         self.rowconfigure(1)
 
         # labels
-        ldate = ttk.LabelFrame(master=self, text=" Date ")
-        ldate.grid(
+        label_date = ttk.LabelFrame(master=self, text=" Date ")
+        label_date.grid(
             column=0, row=0, sticky=Grid.Sticky.N, padx=5, pady=5, ipadx=5, ipady=5
         )
 
-        ltime = ttk.LabelFrame(master=self, text=" Elapsed time ")
-        ltime.grid(
+        label_time = ttk.LabelFrame(master=self, text=" Elapsed time ")
+        label_time.grid(
             column=1, row=0, sticky=Grid.Sticky.N, padx=5, pady=5, ipadx=5, ipady=5
         )
 
-        lnote = ttk.LabelFrame(master=self, text=" Notes ")
-        lnote.grid(
+        label_note = ttk.LabelFrame(master=self, text=" Notes ")
+        label_note.grid(
             column=0,
             row=10,
             sticky=Grid.Sticky.N,
@@ -86,61 +86,61 @@ class DataFrame(BData, TkBase, ttk.Frame):
         )
 
         # date
-        cal = Calendar(master=ldate)
+        cal = Calendar(master=label_date)
         cal.pack(side=Pack.Side.TOP)
-        self._data[Keys.DCALENDAR] = cal
+        self._data[Keys.D_CALENDAR] = cal
         # print(cal.selection_get())
 
         # elapsed time
-        self._data[Keys.DRADIO] = tk.StringVar()
+        self._data[Keys.D_RADIO] = tk.StringVar()
         oprs: tuple[
             tuple[Literal["Add"], Literal["+"]],
             tuple[Literal["Subtract"], Literal["-"]],
         ] = (("Add", "+"), ("Subtract", "-"))
         for opr in oprs:
             ttk.Radiobutton(
-                ltime, text=opr[0], value=opr[1], variable=self._data[Keys.DRADIO]
+                label_time, text=opr[0], value=opr[1], variable=self._data[Keys.D_RADIO]
             ).pack(side=Pack.Side.TOP, fill=Pack.Fill.X, padx=5, pady=2)
-        self._data[Keys.DRADIO].set("+")
-        self._data[Keys.DHOUR] = tk.DoubleVar(value=0)
+        self._data[Keys.D_RADIO].set("+")
+        self._data[Keys.D_HOUR] = tk.DoubleVar(value=0)
         hour = ttk.Spinbox(
-            ltime,
+            label_time,
             from_=0,
             to=23,
-            textvariable=self._data[Keys.DHOUR],
+            textvariable=self._data[Keys.D_HOUR],
             width=10,
             wrap=True,
             state="readonly",
         )
-        self._data[Keys.DHOUR].set(0)
+        self._data[Keys.D_HOUR].set(0)
         hour.pack(side=Pack.Side.TOP, fill=Pack.Fill.X, padx=5, pady=5)
-        self._data[Keys.DMINUTE] = tk.DoubleVar(value=0)
+        self._data[Keys.D_MINUTE] = tk.DoubleVar(value=0)
         minute = ttk.Spinbox(
-            ltime,
+            label_time,
             from_=0,
             to=59,
-            textvariable=self._data[Keys.DMINUTE],
+            textvariable=self._data[Keys.D_MINUTE],
             width=10,
             wrap=True,
             state="readonly",
         )
-        self._data[Keys.DMINUTE].set(0)
+        self._data[Keys.D_MINUTE].set(0)
         minute.pack(side=Pack.Side.TOP, fill=Pack.Fill.X, padx=5, pady=5)
 
         # notes
-        notes = ScrolledText(lnote, width=46, height=8)
-        self._data[Keys.DNOTES] = notes
+        notes = ScrolledText(label_note, width=46, height=8)
+        self._data[Keys.D_NOTES] = notes
         notes.pack(side=Pack.Side.LEFT, fill=Pack.Fill.BOTH, expand=True)
 
     @property
     def get_variables(self) -> tuple[Any, Any, Any, Any, Any]:
         """The get property."""
         return (
-            self._data[Keys.DCALENDAR].selection_get(),
-            self._data[Keys.DRADIO].get(),
-            self._data[Keys.DHOUR].get(),
-            self._data[Keys.DMINUTE].get(),
-            self._data[Keys.DNOTES].get(1.0, tk.END),
+            self._data[Keys.D_CALENDAR].selection_get(),
+            self._data[Keys.D_RADIO].get(),
+            self._data[Keys.D_HOUR].get(),
+            self._data[Keys.D_MINUTE].get(),
+            self._data[Keys.D_NOTES].get(1.0, tk.END),
         )
 
 
@@ -157,9 +157,9 @@ class AddDataDialog(BData, TkBase, tk.Toplevel):
         self.protocol("WM_DELETE_WINDOW", self.__bt_close)
 
         # init locals
-        self._data[Keys.WCLOSED] = False
+        self._data[Keys.W_CLOSED] = False
         self._data[Keys.DIALOG_RETURN] = None
-        self._data[Keys.DDATA] = None
+        self._data[Keys.D_DATA] = None
 
         self.__init_ui()
 
@@ -183,7 +183,7 @@ class AddDataDialog(BData, TkBase, tk.Toplevel):
         # data frame
         data_frame = DataFrame(self)
         data_frame.pack(side=Pack.Side.TOP, fill=Pack.Fill.BOTH, expand=True)
-        self._data[Keys.DFRAME] = data_frame
+        self._data[Keys.D_FRAME] = data_frame
 
         # separator
         sep = ttk.Separator(self, orient=tk.HORIZONTAL)
@@ -196,7 +196,7 @@ class AddDataDialog(BData, TkBase, tk.Toplevel):
         # add close button
         close_button = ttk.Button(bt_frame, text="Close", command=self.__bt_close)
         close_button.pack(side=Pack.Side.RIGHT, padx=2)
-        # add ok buton
+        # add ok button
         ok_button = ttk.Button(bt_frame, text="Ok", command=self.__bt_ok)
         ok_button.pack(side=Pack.Side.RIGHT, padx=2)
         self.update()
@@ -204,7 +204,7 @@ class AddDataDialog(BData, TkBase, tk.Toplevel):
     def __bt_ok(self) -> None:
         """Button OK handler."""
         self._data[Keys.DIALOG_RETURN] = True
-        self._data[Keys.DDATA] = self._data[Keys.DFRAME].get_variables
+        self._data[Keys.D_DATA] = self._data[Keys.D_FRAME].get_variables
         self.destroy()
 
     def __bt_close(self) -> None:
@@ -220,11 +220,11 @@ class AddDataDialog(BData, TkBase, tk.Toplevel):
     @property
     def dialog_data(self) -> Optional[Tuple]:
         """The dialog_data property."""
-        return self._data[Keys.DDATA]
+        return self._data[Keys.D_DATA]
 
 
 class ReportDialog(TkBase, BDbHandler, tk.Toplevel):
-    """Dailog box."""
+    """Dialog box."""
 
     def __init__(self, master, dbh: Database, **args) -> None:
         """Constructor."""
@@ -234,7 +234,7 @@ class ReportDialog(TkBase, BDbHandler, tk.Toplevel):
         self.minsize(800, 500)
 
         # init locals
-        self._data[Keys.WCLOSED] = False
+        self._data[Keys.W_CLOSED] = False
         self._db_handler = dbh
 
         self.__init_ui()
@@ -276,7 +276,7 @@ class ReportDialog(TkBase, BDbHandler, tk.Toplevel):
         tree.column(columns[2], minwidth=0, width=400)
 
         tree.pack(side=Pack.Side.LEFT, fill=Pack.Fill.BOTH, expand=True)
-        self._data[Keys.DREPORT] = tree
+        self._data[Keys.D_REPORT] = tree
 
         # add a scrollbar
         scrollbar = ttk.Scrollbar(data_frame, orient=tk.VERTICAL, command=tree.yview)
@@ -309,7 +309,7 @@ class ReportDialog(TkBase, BDbHandler, tk.Toplevel):
 
     def __on_closing(self) -> None:
         """On Closing Event."""
-        self._data[Keys.WCLOSED] = True
+        self._data[Keys.W_CLOSED] = True
         self.destroy()
 
     def __bt_close(self) -> None:
@@ -338,30 +338,30 @@ class ReportDialog(TkBase, BDbHandler, tk.Toplevel):
         )
         self.focus()
         if file is not None:
-            tree: ttk.Treeview = self._data[Keys.DREPORT]
+            tree: ttk.Treeview = self._data[Keys.D_REPORT]
             for child in tree.get_children():
-                ldata: List = tree.item(child)["values"]  # type: ignore
-                start = ldata[0]
-                duration = ldata[1]
-                notes = ldata[2]
+                list_data: List = tree.item(child)["values"]  # type: ignore
+                start = list_data[0]
+                duration = list_data[1]
+                notes = list_data[2]
                 file.write(f"{start}\t{duration}\t{notes}\n")
             file.close()
 
     def __add_record(self, arg: Tuple) -> None:
         """Add record to database."""
-        rdate: date = arg[0]
-        ropr: str = arg[1]
-        rhour: float = arg[2]
-        rminute: float = arg[3]
-        rnote: str = arg[4]
+        rec_date: date = arg[0]
+        rec_opr: str = arg[1]
+        rec_hour: float = arg[2]
+        rec_minute: float = arg[3]
+        rec_note: str = arg[4]
 
         rec = TWorkTime()
         rec.start = int(
-            datetime(year=rdate.year, month=rdate.month, day=rdate.day).timestamp()
+            datetime(year=rec_date.year, month=rec_date.month, day=rec_date.day).timestamp()
         )
-        multi: Literal[-1, 1] = -1 if ropr == "-" else 1
-        rec.duration = int(multi * (rhour * 3600 + rminute * 60))
-        rec.notes = rnote.strip("\n")
+        multi: Literal[-1, 1] = -1 if rec_opr == "-" else 1
+        rec.duration = int(multi * (rec_hour * 3600 + rec_minute * 60))
+        rec.notes = rec_note.strip("\n")
         session: Optional[Session] = self._db_handler.session
         if session:
             session.add(rec)
@@ -387,24 +387,24 @@ class ReportDialog(TkBase, BDbHandler, tk.Toplevel):
             session.commit()
 
         # getting report
-        dsum = 0
+        date_sum = 0
         out = list()
         tmp: datetime = DateTime.now()
         # beginning of the month timestamp
-        bmonth: int = int(datetime(year=tmp.year, month=tmp.month, day=1).timestamp())
+        beginning_month: int = int(datetime(year=tmp.year, month=tmp.month, day=1).timestamp())
         row = (
             session.query(func.sum(TWorkTime.duration))
-            .filter(TWorkTime.start < bmonth)
+            .filter(TWorkTime.start < beginning_month)
             .order_by(TWorkTime.start)
             .first()
         )
         if row and row[0] is not None:
-            dsum += row[0]
+            date_sum += row[0]
             out.append(
                 (
-                    DateTime.datetime_from_timestamp(bmonth),
+                    DateTime.datetime_from_timestamp(beginning_month),
                     self.__format_time(
-                        DateTime.elapsed_time_from_seconds(dsum).total_seconds()
+                        DateTime.elapsed_time_from_seconds(date_sum).total_seconds()
                     ),
                     "Balance of the previous month",
                 )
@@ -413,23 +413,23 @@ class ReportDialog(TkBase, BDbHandler, tk.Toplevel):
         # getting data for the current month
         dataset: List[TWorkTime] = (
             session.query(TWorkTime)
-            .filter(TWorkTime.start > bmonth)
+            .filter(TWorkTime.start > beginning_month)
             .order_by(TWorkTime.start)
             .all()
         )
         for item in dataset:
-            idate: datetime = DateTime.datetime_from_timestamp(item.start)
-            idur: timedelta = DateTime.elapsed_time_from_seconds(abs(item.duration))
+            item_date: datetime = DateTime.datetime_from_timestamp(item.start)
+            item_dur: timedelta = DateTime.elapsed_time_from_seconds(abs(item.duration))
             opr: Literal["-", ""] = "-" if item.duration < 0 else ""
-            dsum += item.duration
-            out.append((idate, f"{opr}{idur}", item.notes))
+            date_sum += item.duration
+            out.append((item_date, f"{opr}{item_dur}", item.notes))
 
         if dataset:
             out.append(
                 (
                     DateTime.datetime_from_timestamp(Timestamp.now),
                     self.__format_time(
-                        DateTime.elapsed_time_from_seconds(dsum).total_seconds()
+                        DateTime.elapsed_time_from_seconds(date_sum).total_seconds()
                     ),
                     "Current Balance",
                 )
@@ -439,7 +439,7 @@ class ReportDialog(TkBase, BDbHandler, tk.Toplevel):
         return tuple(out)
 
     def __format_time(self, total_seconds: float) -> str:
-        """Returns formated time string."""
+        """Returns formatted time string."""
         hours: float
         reminder: float
         minutes: float
@@ -451,7 +451,7 @@ class ReportDialog(TkBase, BDbHandler, tk.Toplevel):
     @property
     def is_closed(self) -> bool:
         """The is_closed property."""
-        return self._data[Keys.WCLOSED]
+        return self._data[Keys.W_CLOSED]
 
 
 # #[EOF]#######################################################################

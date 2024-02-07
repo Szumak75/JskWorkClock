@@ -37,7 +37,7 @@ from jsktoolbox.tktool.layout import Pack
 
 
 class NotesDialog(BData, TkBase, tk.Toplevel):
-    """Modal Dailog box."""
+    """Modal Dialog box."""
 
     def __init__(self, master, **args) -> None:
         """Constructor."""
@@ -79,7 +79,7 @@ class NotesDialog(BData, TkBase, tk.Toplevel):
         )
         # add entry
         notes = ScrolledText(notes_frame, width=50, height=10)
-        self._data[Keys.DNOTES] = notes
+        self._data[Keys.D_NOTES] = notes
         notes.pack(side=Pack.Side.LEFT, fill=Pack.Fill.BOTH, expand=True)
 
         # separator
@@ -92,7 +92,7 @@ class NotesDialog(BData, TkBase, tk.Toplevel):
         # add close button
         close_button = ttk.Button(bt_frame, text="Close", command=self.__bt_close)
         close_button.pack(side=Pack.Side.RIGHT, padx=2)
-        # add ok buton
+        # add ok button
         ok_button = ttk.Button(bt_frame, text="Ok", command=self.__bt_ok)
         ok_button.pack(side=Pack.Side.RIGHT, padx=2)
         self.update()
@@ -100,7 +100,7 @@ class NotesDialog(BData, TkBase, tk.Toplevel):
     def __bt_ok(self) -> None:
         """Button OK handler."""
         self._data[Keys.DIALOG_RETURN] = True
-        notes: tk.Text = self._data[Keys.DNOTES]
+        notes: tk.Text = self._data[Keys.D_NOTES]
         self._data[Keys.TEXT] = notes.get(1.0, tk.END)
         self.destroy()
 

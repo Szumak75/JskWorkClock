@@ -3,7 +3,7 @@
   Author:  Jacek 'Szumak' Kotlarski --<szumak@virthost.pl>
   Created: 10.12.2023
 
-  Purpose: Sets of base classess.
+  Purpose: Sets of base classes.
 """
 
 from inspect import currentframe
