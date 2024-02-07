@@ -284,8 +284,7 @@ class ReportDialog(TkBase, BDbHandler, tk.Toplevel):
         scrollbar.pack(side=Pack.Side.RIGHT, fill=Pack.Fill.Y)
 
         # tree data
-        for item in self.__get_data():
-            tree.insert("", tk.END, values=item)
+        self.__tree_reload()
 
         # separator
         sep = ttk.Separator(self, orient=tk.HORIZONTAL)
@@ -307,6 +306,15 @@ class ReportDialog(TkBase, BDbHandler, tk.Toplevel):
         save_button = ttk.Button(bt_frame, text="Save", command=self.__bt_save)
         save_button.pack(side=Pack.Side.RIGHT, padx=2)
 
+    def __tree_reload(self) -> None:
+        tree: ttk.Treeview = self._data[Keys.D_REPORT]
+        # emptying tree
+        for item in tree.get_children():
+            tree.delete(item)
+        # fill tree
+        for item in self.__get_data():
+            tree.insert("", tk.END, values=item)
+
     def __on_closing(self) -> None:
         """On Closing Event."""
         self._data[Keys.W_CLOSED] = True
@@ -324,6 +332,8 @@ class ReportDialog(TkBase, BDbHandler, tk.Toplevel):
             if dialog.dialog_data:
                 # add record
                 self.__add_record(dialog.dialog_data)
+                # reload data
+                self.__tree_reload()
         dialog.destroy()
 
     def __bt_save(self) -> None:
@@ -357,7 +367,9 @@ class ReportDialog(TkBase, BDbHandler, tk.Toplevel):
 
         rec = TWorkTime()
         rec.start = int(
-            datetime(year=rec_date.year, month=rec_date.month, day=rec_date.day).timestamp()
+            datetime(
+                year=rec_date.year, month=rec_date.month, day=rec_date.day
+            ).timestamp()
         )
         multi: Literal[-1, 1] = -1 if rec_opr == "-" else 1
         rec.duration = int(multi * (rec_hour * 3600 + rec_minute * 60))
@@ -391,7 +403,9 @@ class ReportDialog(TkBase, BDbHandler, tk.Toplevel):
         out = list()
         tmp: datetime = DateTime.now()
         # beginning of the month timestamp
-        beginning_month: int = int(datetime(year=tmp.year, month=tmp.month, day=1).timestamp())
+        beginning_month: int = int(
+            datetime(year=tmp.year, month=tmp.month, day=1).timestamp()
+        )
         row = (
             session.query(func.sum(TWorkTime.duration))
             .filter(TWorkTime.start < beginning_month)
