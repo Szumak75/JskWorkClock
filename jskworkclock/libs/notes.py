@@ -7,31 +7,17 @@
   Purpose: Notes dialog class.
 """
 
-import os
 import tkinter as tk
 
-from tkinter import Scrollbar, ttk
+from tkinter import ttk
 from tkinter.scrolledtext import ScrolledText
-from time import sleep
-from turtle import width
 from typing import Optional
-from PIL import Image, ImageDraw
-from time import sleep
-from threading import Thread
-from inspect import currentframe
-from datetime import timedelta
-from click import command
 
 from jsktoolbox.libs.base_data import BData
-from jsktoolbox.datetool import DateTime, Timestamp
-from jsktoolbox.attribtool import ReadOnlyClass
-from jsktoolbox.libs.system import PathChecker, Env
-from jsktoolbox.raisetool import Raise
 from jsktoolbox.tktool.base import TkBase
 
 
 from libs.ico import ImageBase64
-from libs.database import Database, TWorkTime
 from libs.keys import Keys
 from jsktoolbox.tktool.layout import Pack
 
@@ -41,7 +27,6 @@ class NotesDialog(BData, TkBase, tk.Toplevel):
 
     def __init__(self, master, **args) -> None:
         """Constructor."""
-        # tk.Toplevel.__init__(self, parent, *args)
         super().__init__(master, **args)
         self.title(f"{master.title()}: Notes")
         self.minsize(600, 400)

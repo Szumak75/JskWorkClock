@@ -11,22 +11,13 @@
 """
 
 
-from calendar import month
-import os
 import tkinter as tk
 
 from tkinter import ttk
 from tkinter.scrolledtext import ScrolledText
-from tkinter.filedialog import SaveFileDialog
 from tkinter.filedialog import asksaveasfile
 
-from time import sleep
-from turtle import heading
 from typing import Optional, Literal, List, Tuple, Any
-from PIL import Image, ImageDraw
-from time import sleep
-from threading import Thread
-from inspect import currentframe
 from datetime import timedelta, datetime, date
 
 from tkcalendar import Calendar
@@ -36,9 +27,7 @@ from sqlalchemy.sql import func, and_
 
 from jsktoolbox.libs.base_data import BData
 from jsktoolbox.datetool import DateTime, Timestamp
-from jsktoolbox.attribtool import ReadOnlyClass
-from jsktoolbox.libs.system import PathChecker, Env
-from jsktoolbox.raisetool import Raise
+from jsktoolbox.libs.system import Env
 from jsktoolbox.tktool.layout import Grid, Pack
 from jsktoolbox.tktool.base import TkBase
 

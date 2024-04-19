@@ -10,14 +10,8 @@ from inspect import currentframe
 from typing import Optional
 
 from sqlalchemy import (
-    Column,
-    ForeignKey,
-    Integer,
-    String,
     create_engine,
-    Text,
 )
-from sqlalchemy.schema import SchemaConst
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm.session import Session
@@ -31,9 +25,9 @@ from jsktoolbox.raisetool import Raise
 class _Keys(object, metaclass=ReadOnlyClass):
     """Local keys."""
 
-    DB_PATH = "_db_path_"
-    DEBUG = "_debug_"
-    DBH = "_db_handler_"
+    DB_PATH: str = "_db_path_"
+    DEBUG: str = "_debug_"
+    DBH: str = "_db_handler_"
 
 
 class LocalBase(DeclarativeBase):

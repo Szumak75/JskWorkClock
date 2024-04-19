@@ -11,21 +11,16 @@
 """
 
 import os
-from textwrap import fill
 import tkinter as tk
 
 from tkinter import ttk
 from time import sleep
 from typing import Optional
-from PIL import Image, ImageDraw
 from time import sleep
 from threading import Thread
 from inspect import currentframe
 from datetime import timedelta
-from l10n import Locales
-from jsktoolbox.libs.base_data import BData
 from jsktoolbox.datetool import DateTime, Timestamp
-from jsktoolbox.attribtool import ReadOnlyClass
 from jsktoolbox.libs.system import PathChecker, Env
 from jsktoolbox.raisetool import Raise
 from jsktoolbox.tktool.base import TkBase
@@ -38,7 +33,6 @@ from libs.database import Database, TWorkTime
 from libs.keys import Keys
 from libs.notes import NotesDialog
 from libs.report import ReportDialog
-from libs.system import Translate
 
 
 class MainFrame(TkBase, BDbHandler, ttk.Frame):
