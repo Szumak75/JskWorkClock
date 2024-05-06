@@ -230,6 +230,9 @@ class ReportDialog(TkBase, BDbHandler, tk.Toplevel):
 
     def __init_ui(self) -> None:
         """Create user interface."""
+        # set initial flags
+        self._data[Keys.SWITCH_FLAG] = False
+
         # main window
         self.geometry("700x600")
 
@@ -295,6 +298,13 @@ class ReportDialog(TkBase, BDbHandler, tk.Toplevel):
         save_button = ttk.Button(bt_frame, text="Save", command=self.__bt_save)
         save_button.pack(side=Pack.Side.RIGHT, padx=2)
 
+        # add previous/current month
+        switch_button = ttk.Button(
+            bt_frame, text="Switch to previous month", command=self.__bt_switch
+        )
+        switch_button.pack(side=Pack.Side.RIGHT, padx=2)
+        self._data[Keys.BT_SWITCH] = switch_button
+
     def __tree_reload(self) -> None:
         tree: ttk.Treeview = self._data[Keys.D_REPORT]
         # emptying tree
@@ -308,6 +318,19 @@ class ReportDialog(TkBase, BDbHandler, tk.Toplevel):
         """On Closing Event."""
         self._data[Keys.W_CLOSED] = True
         self.destroy()
+
+    def __bt_switch(self) -> None:
+        """Button 'Switch' Event."""
+        bt: ttk.Button = self._data[Keys.BT_SWITCH]
+        self._data[Keys.SWITCH_FLAG] = not self._data[Keys.SWITCH_FLAG]
+
+        if self._data[Keys.SWITCH_FLAG]:
+            bt["text"] = "Switch to current month"
+        else:
+            bt["text"] = "Switch to previous month"
+
+        # reload data
+        self.__tree_reload()
 
     def __bt_close(self) -> None:
         """Button 'Close' Event."""
@@ -391,6 +414,10 @@ class ReportDialog(TkBase, BDbHandler, tk.Toplevel):
         date_sum = 0
         out = list()
         tmp: datetime = DateTime.now()
+        if self._data[Keys.SWITCH_FLAG]:
+            # reset initial time to previous month
+            tmp2 = datetime(year=tmp.year, month=tmp.month, day=1)
+            tmp = DateTime.datetime_from_timestamp(tmp2.timestamp() - 1)
         # beginning of the month timestamp
         beginning_month: int = int(
             datetime(year=tmp.year, month=tmp.month, day=1).timestamp()
