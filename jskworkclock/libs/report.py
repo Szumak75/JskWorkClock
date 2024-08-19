@@ -12,10 +12,11 @@
 
 
 import tkinter as tk
+import pickle
 
 from tkinter import ttk
 from tkinter.scrolledtext import ScrolledText
-from tkinter.filedialog import asksaveasfile
+from tkinter.filedialog import asksaveasfile, askopenfile
 
 from typing import Optional, Literal, List, Tuple, Any
 from datetime import timedelta, datetime, date
@@ -305,6 +306,14 @@ class ReportDialog(TkBase, BDbHandler, tk.Toplevel):
         switch_button.pack(side=Pack.Side.RIGHT, padx=2)
         self._data[Keys.BT_SWITCH] = switch_button
 
+        # add export button
+        export_button = ttk.Button(bt_frame, text="Export", command=self.__bt_export)
+        export_button.pack(side=Pack.Side.RIGHT, padx=2)
+
+        # add import button
+        import_button = ttk.Button(bt_frame, text="Import", command=self.__bt_import)
+        import_button.pack(side=Pack.Side.RIGHT, padx=2)
+
     def __tree_reload(self) -> None:
         tree: ttk.Treeview = self._data[Keys.D_REPORT]
         # emptying tree
@@ -313,6 +322,70 @@ class ReportDialog(TkBase, BDbHandler, tk.Toplevel):
         # fill tree
         for item in self.__get_data():
             tree.insert("", tk.END, values=item)
+
+    def __bt_export(self) -> None:
+        """On Export Event."""
+        file = asksaveasfile(
+            parent=self,
+            initialfile=f"WorkClock-export-{MDateTime.short_date}.wrk",
+            defaultextension=".wrk",
+            filetypes=[("WorkClock export file", "*.wrk")],
+            initialdir=Env.home,
+        )
+        self.focus()
+        if file is not None:
+            file.close()
+            # dump data
+            tmp = []
+            session: Optional[Session] = self._db_handler.session
+            if session is not None:
+                rows = session.query(TWorkTime).all()
+                for item in rows:
+                    tmp.append(item)
+                # pickle list
+                # print(file.name)
+                with open(file.name, "wb") as outfile:
+                    pickle.dump(tmp, outfile)
+
+                session.close()
+
+    def __bt_import(self) -> None:
+        """On Import Event."""
+        file = askopenfile(
+            parent=self,
+            defaultextension=".wrk",
+            filetypes=[("WorkClock export file", "*.wrk")],
+            initialdir=Env.home,
+        )
+        self.focus()
+        if file is not None:
+            file.close()
+            tmp: List[TWorkTime] = []
+            with open(file.name, "rb") as in_file:
+                tmp = pickle.load(in_file)
+            if tmp:
+                # import procedure
+                session: Optional[Session] = self._db_handler.session
+                if session is not None:
+                    for item in tmp:
+                        row = (
+                            session.query(TWorkTime)
+                            .filter(
+                                TWorkTime.start == item.start,
+                                TWorkTime.duration == item.duration,
+                                TWorkTime.notes == item.notes,
+                            )
+                            .first()
+                        )
+                        if not row:
+                            data = TWorkTime()
+                            data.start = item.start
+                            data.duration = item.duration
+                            data.notes = item.notes
+                            session.add(data)
+                            session.commit()
+                    session.close()
+                    self.__tree_reload()
 
     def __on_closing(self) -> None:
         """On Closing Event."""
