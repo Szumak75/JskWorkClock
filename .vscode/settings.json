@@ -9,5 +9,8 @@
             "group": "Local Projects"
         }
     ],
-    "sqltools.useNodeRuntime": true
+    "sqltools.useNodeRuntime": true,
+    "cSpell.words": [
+        "jskworkclock"
+    ]
 }
