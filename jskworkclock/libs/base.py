@@ -11,8 +11,8 @@ from inspect import currentframe
 from jsktoolbox.libs.base_data import BData
 from jsktoolbox.raisetool import Raise
 
-from libs.keys import Keys
-from libs.database import Database
+from jskworkclock.libs.keys import Keys
+from jskworkclock.libs.database import Database
 
 
 class BDbHandler(BData):

@@ -32,11 +32,11 @@ from jsktoolbox.libs.system import Env
 from jsktoolbox.tktool.layout import Grid, Pack
 from jsktoolbox.tktool.base import TkBase
 
-from libs.ico import ImageBase64
-from libs.database import Database, TWorkTime
-from libs.keys import Keys
-from libs.base import BDbHandler
-from libs.system import MDateTime
+from jskworkclock.libs.ico import ImageBase64
+from jskworkclock.libs.database import Database, TWorkTime
+from jskworkclock.libs.keys import Keys
+from jskworkclock.libs.base import BDbHandler
+from jskworkclock.libs.system import MDateTime
 
 
 class DataFrame(BData, TkBase, ttk.Frame):

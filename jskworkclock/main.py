@@ -27,12 +27,12 @@ from jsktoolbox.tktool.base import TkBase
 from jsktoolbox.tktool.layout import Pack
 from sqlalchemy.orm import Session
 
-from libs.base import BDbHandler
-from libs.ico import ImageBase64
-from libs.database import Database, TWorkTime
-from libs.keys import Keys
-from libs.notes import NotesDialog
-from libs.report import ReportDialog
+from jskworkclock.libs.base import BDbHandler
+from jskworkclock.libs.ico import ImageBase64
+from jskworkclock.libs.database import Database, TWorkTime
+from jskworkclock.libs.keys import Keys
+from jskworkclock.libs.notes import NotesDialog
+from jskworkclock.libs.report import ReportDialog
 
 
 class MainFrame(TkBase, BDbHandler, ttk.Frame):
