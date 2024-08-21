@@ -15,11 +15,11 @@ from typing import Optional
 
 from jsktoolbox.libs.base_data import BData
 from jsktoolbox.tktool.base import TkBase
-
-
-from jskworkclock.libs.ico import ImageBase64
-from jskworkclock.libs.keys import Keys
 from jsktoolbox.tktool.layout import Pack
+
+
+from libs.ico import ImageBase64
+from libs.keys import Keys
 
 
 class NotesDialog(BData, TkBase, tk.Toplevel):
