@@ -1,5 +1,5 @@
 {
-    "python.analysis.typeCheckingMode": "basic",
+    "python.analysis.typeCheckingMode": "standard",
     "sqltools.connections": [
         {
             "previewLimit": 50,
@@ -11,6 +11,11 @@
     ],
     "sqltools.useNodeRuntime": true,
     "cSpell.words": [
-        "jskworkclock"
+        "initialdir",
+        "initialfile",
+        "jskworkclock",
+        "minwidth",
+        "tkcalendar",
+        "worktime"
     ]
 }
