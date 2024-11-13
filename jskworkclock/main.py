@@ -15,7 +15,7 @@ import tkinter as tk
 
 from tkinter import ttk
 from time import sleep
-from typing import Optional
+from typing import Optional,Union
 from time import sleep
 from threading import Thread
 from inspect import currentframe
@@ -89,10 +89,10 @@ class MainFrame(TkBase, BDbHandler, ttk.Frame):
         """Threaded worker."""
         notes: Optional[str] = None
         elapsed_time: Optional[timedelta] = None
-        start: int = Timestamp.now
+        start: Union[int,float] = Timestamp.now()
         title: str = f"{self._data[Keys.DEF_NAME]}"
         while not self._data[Keys.F_STOP]:
-            elapsed_time = DateTime.elapsed_time_from_seconds(Timestamp.now - start)
+            elapsed_time = DateTime.elapsed_time_from_seconds(Timestamp.now() - start)
             if self.master is not None:
                 self.master.title(f"{title}: {elapsed_time}")  # type: ignore
             sleep(1)
@@ -111,10 +111,10 @@ class MainFrame(TkBase, BDbHandler, ttk.Frame):
         session: Optional[Session] = self._db_handler.session
         if session:
             obj = TWorkTime()
-            obj.start = start
+            obj.start = int(start)
             obj.duration = int(
                 DateTime.elapsed_time_from_seconds(
-                    Timestamp.now - start
+                    Timestamp.now() - start
                 ).total_seconds()
             )
             if notes:
@@ -150,7 +150,7 @@ class WorkClock(tk.Tk, TkBase, BDbHandler):
     def __init_db(self) -> None:
         """Initialize database connection."""
         tmp: str = os.path.join(
-            Env.home, self._data[Keys.CACHE_DIR], self._data[Keys.DATABASE]
+            Env().home, self._data[Keys.CACHE_DIR], self._data[Keys.DATABASE]
         )
         db = Database(tmp)
         if db is not None:
@@ -163,7 +163,7 @@ class WorkClock(tk.Tk, TkBase, BDbHandler):
     def __init_dirs(self) -> None:
         """Initialize local path for database."""
         tmp: str = os.path.join(
-            Env.home, self._data[Keys.CACHE_DIR], self._data[Keys.DATABASE]
+            Env().home, self._data[Keys.CACHE_DIR], self._data[Keys.DATABASE]
         )
         # print(tmp)
         pc = PathChecker(tmp)

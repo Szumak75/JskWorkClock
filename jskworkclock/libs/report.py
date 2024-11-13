@@ -327,10 +327,10 @@ class ReportDialog(TkBase, BDbHandler, tk.Toplevel):
         """On Export Event."""
         file = asksaveasfile(
             parent=self,
-            initialfile=f"WorkClock-export-{MDateTime.short_date}.wrk",
+            initialfile=f"WorkClock-export-{MDateTime.short_date()}.wrk",
             defaultextension=".wrk",
             filetypes=[("WorkClock export file", "*.wrk")],
-            initialdir=Env.home,
+            initialdir=Env().home,
         )
         self.focus()
         if file is not None:
@@ -355,7 +355,7 @@ class ReportDialog(TkBase, BDbHandler, tk.Toplevel):
             parent=self,
             defaultextension=".wrk",
             filetypes=[("WorkClock export file", "*.wrk")],
-            initialdir=Env.home,
+            initialdir=Env().home,
         )
         self.focus()
         if file is not None:
@@ -426,10 +426,10 @@ class ReportDialog(TkBase, BDbHandler, tk.Toplevel):
         # sfd = SaveFileDialog(master=self)
         file = asksaveasfile(
             parent=self,
-            initialfile=f"Report-{MDateTime.short_date}.txt",
+            initialfile=f"Report-{MDateTime.short_date()}.txt",
             defaultextension=".txt",
             filetypes=[("All Files", "*.*"), ("Text Documents", "*.txt")],
-            initialdir=Env.home,
+            initialdir=Env().home,
         )
         self.focus()
         if file is not None:
@@ -530,7 +530,7 @@ class ReportDialog(TkBase, BDbHandler, tk.Toplevel):
         if dataset:
             out.append(
                 (
-                    DateTime.datetime_from_timestamp(Timestamp.now),
+                    DateTime.datetime_from_timestamp(Timestamp.now()),
                     self.__format_time(
                         DateTime.elapsed_time_from_seconds(date_sum).total_seconds()
                     ),

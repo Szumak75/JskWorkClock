@@ -20,7 +20,6 @@ class MDateTime(DateTime):
     """docstring for MDateTime."""
 
     @classmethod
-    @property
     def short_date(cls) -> str:
         dtn: datetime = DateTime.now()
         return f"{dtn.year}-{dtn.month}-{dtn.day}"
@@ -29,12 +28,10 @@ class MDateTime(DateTime):
 class MEnv(Env):
     """Extended Env version."""
 
-    @classmethod
-    @property
-    def lang(cls) -> Optional[str]:
+    def lang(self) -> Optional[str]:
         """The lang property."""
         lang: Optional[str] = os.getenv("LANG")
-        print(lang)
+        print(f"DEBUG: {lang}")
         if lang is not None:
             if lang.find("_") > -1:
                 return lang.split("_")[0]
@@ -49,8 +46,9 @@ class Translate(object):
     def __init__(self) -> None:
         """Constructor."""
         locales = Locales()
-        if MEnv.lang is not None:
-            self.__locales = locales[MEnv.lang]
+        lang = MEnv().lang()
+        if lang is not None:
+            self.__locales = locales[lang]
         else:
             self.__locales = locales["C"]
 

@@ -15,6 +15,7 @@
         "initialfile",
         "jskworkclock",
         "minwidth",
+        "tearoff",
         "tkcalendar",
         "worktime"
     ]
