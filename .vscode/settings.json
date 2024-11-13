@@ -18,5 +18,8 @@
         "tearoff",
         "tkcalendar",
         "worktime"
+    ],
+    "python.analysis.extraPaths": [
+        "./jskworkclock"
     ]
 }
