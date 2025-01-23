@@ -15,7 +15,7 @@ import tkinter as tk
 
 from tkinter import ttk
 from time import sleep
-from typing import Optional,Union
+from typing import Optional, Union
 from time import sleep
 from threading import Thread
 from inspect import currentframe
@@ -43,9 +43,9 @@ class MainFrame(TkBase, BDbHandler, ttk.Frame):
         super().__init__(master, **args)
 
         # init locals
-        self._data[Keys.F_STOP] = False
-        self._data[Keys.DEF_NAME] = master.title()
-        self._data[Keys.TH_CLOCK] = None
+        self._set_data(key=Keys.F_STOP, value=False, set_default_type=bool)
+        self._set_data(key=Keys.DEF_NAME, value=master.title(), set_default_type=str)
+        self._set_data(key=Keys.TH_CLOCK, value=None, set_default_type=Optional[Thread])
         self._db_handler = dbh
 
         # init ui
@@ -54,51 +54,62 @@ class MainFrame(TkBase, BDbHandler, ttk.Frame):
     def __init_ui(self) -> None:
         """Initialize GUI."""
         # loc = Translate()
-        self._data[Keys.BT_START] = ttk.Button(
-            # self, text=loc.get("Start"), command=self.__bt_start, width=15
-            self,
-            text="Start",
-            command=self.__bt_start,
-            width=15,
+        self._set_data(
+            key=Keys.BT_START,
+            value=ttk.Button(
+                # self, text=loc.get("Start"), command=self.__bt_start, width=15
+                self,
+                text="Start",
+                command=self.__bt_start,
+                width=15,
+            ),
+            set_default_type=ttk.Button,
         )
-        self._data[Keys.BT_START].pack(
+        self._get_data(key=Keys.BT_START).pack(  # type: ignore
             side=Pack.Side.LEFT, expand=True, fill=Pack.Fill.BOTH, padx=4, pady=4
         )
-        self._data[Keys.BT_STOP] = ttk.Button(
-            self, text="Stop", command=self.__bt_stop, width=15, state=tk.DISABLED
+        self._set_data(
+            key=Keys.BT_STOP,
+            value=ttk.Button(
+                self, text="Stop", command=self.__bt_stop, width=15, state=tk.DISABLED
+            ),
+            set_default_type=ttk.Button,
         )
-        self._data[Keys.BT_STOP].pack(
+        self._get_data(key=Keys.BT_STOP).pack(  # type: ignore
             side=Pack.Side.RIGHT, expand=True, fill=Pack.Fill.BOTH, padx=4, pady=4
         )
 
     def __bt_start(self) -> None:
         """[Start] click."""
-        self._data[Keys.F_STOP] = False
-        self._data[Keys.TH_CLOCK] = Thread(
-            target=self.__th_worker, name="WorkingTime worker", daemon=True
+        self._set_data(key=Keys.F_STOP, value=False)
+        self._set_data(
+            key=Keys.TH_CLOCK,
+            value=Thread(
+                target=self.__th_worker, name="WorkingTime worker", daemon=True
+            ),
         )
-        self._data[Keys.TH_CLOCK].start()
-        self._data[Keys.BT_START][Keys.STATE] = tk.DISABLED
-        self._data[Keys.BT_STOP][Keys.STATE] = tk.NORMAL
+        self._get_data(key=Keys.TH_CLOCK).start()  # type: ignore
+        self._get_data(key=Keys.BT_START)[Keys.STATE] = tk.DISABLED  # type: ignore
+        self._get_data(key=Keys.BT_STOP)[Keys.STATE] = tk.NORMAL  # type: ignore
 
     def __bt_stop(self) -> None:
         """[Stop] click."""
-        self._data[Keys.F_STOP] = True
+        self._set_data(key=Keys.F_STOP, value=True)
 
     def __th_worker(self) -> None:
         """Threaded worker."""
         notes: Optional[str] = None
         elapsed_time: Optional[timedelta] = None
-        start: Union[int,float] = Timestamp.now()
-        title: str = f"{self._data[Keys.DEF_NAME]}"
-        while not self._data[Keys.F_STOP]:
+        start: Union[int, float] = Timestamp.now()
+        title: str = f"{self._get_data(key=Keys.DEF_NAME)}"
+        while not self._get_data(key=Keys.F_STOP):
             elapsed_time = DateTime.elapsed_time_from_seconds(Timestamp.now() - start)
             if self.master is not None:
                 self.master.title(f"{title}: {elapsed_time}")  # type: ignore
             sleep(1)
 
-        self._data[Keys.BT_START][Keys.STATE] = tk.NORMAL
-        self._data[Keys.BT_STOP][Keys.STATE] = tk.DISABLED
+        self._get_data(key=Keys.BT_START)[Keys.STATE] = tk.NORMAL  # type: ignore
+        self._get_data(key=Keys.BT_STOP)[Keys.STATE] = tk.DISABLED  # type: ignore
         # raise message box for notes
         dialog = NotesDialog(self.master)
         dialog.wait_window()
@@ -135,8 +146,13 @@ class WorkClock(tk.Tk, TkBase, BDbHandler):
 
         # init locals
         self._data[Keys.W_REPORT] = None
-        self._data[Keys.CACHE_DIR] = ".cache/jskworkclock"
-        self._data[Keys.DATABASE] = "data.sqlite"
+        self._set_data(
+            key=Keys.W_REPORT, value=None, set_default_type=Optional[ReportDialog]
+        )
+        self._set_data(
+            key=Keys.CACHE_DIR, value=".cache/jskworkclock", set_default_type=str
+        )
+        self._set_data(key=Keys.DATABASE, value="data.sqlite", set_default_type=str)
 
         # init dirs
         self.__init_dirs()
@@ -150,7 +166,9 @@ class WorkClock(tk.Tk, TkBase, BDbHandler):
     def __init_db(self) -> None:
         """Initialize database connection."""
         tmp: str = os.path.join(
-            Env().home, self._data[Keys.CACHE_DIR], self._data[Keys.DATABASE]
+            Env().home,
+            f"{self._get_data(key=Keys.CACHE_DIR)}",
+            f"{self._get_data(key=Keys.DATABASE)}",
         )
         db = Database(tmp)
         if db is not None:
@@ -163,7 +181,9 @@ class WorkClock(tk.Tk, TkBase, BDbHandler):
     def __init_dirs(self) -> None:
         """Initialize local path for database."""
         tmp: str = os.path.join(
-            Env().home, self._data[Keys.CACHE_DIR], self._data[Keys.DATABASE]
+            Env().home,
+            f"{self._get_data(key=Keys.CACHE_DIR)}",
+            f"{self._get_data(key=Keys.DATABASE)}",
         )
         # print(tmp)
         pc = PathChecker(tmp)
@@ -217,11 +237,14 @@ class WorkClock(tk.Tk, TkBase, BDbHandler):
 
     def __report(self) -> None:
         """Report dialog."""
-        if self._data[Keys.W_REPORT] is None or self._data[Keys.W_REPORT].is_closed:
-            if self._data[Keys.W_REPORT] is not None:
-                del self._data[Keys.W_REPORT]
-                self._data[Keys.W_REPORT] = None
-            self._data[Keys.W_REPORT] = ReportDialog(master=self, dbh=self._db_handler)
+        wr: Optional[ReportDialog] = self._get_data(key=Keys.W_REPORT)
+        if wr is None or wr.is_closed:
+            if wr is not None:
+                del wr
+                self._set_data(key=Keys.W_REPORT, value=None)
+            self._set_data(
+                key=Keys.W_REPORT, value=ReportDialog(master=self, dbh=self._db_handler)
+            )
 
 
 if __name__ == "__main__":
