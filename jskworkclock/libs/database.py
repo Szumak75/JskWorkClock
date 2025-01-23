@@ -9,9 +9,7 @@
 from inspect import currentframe
 from typing import Optional
 
-from sqlalchemy import (
-    create_engine,
-)
+from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm.session import Session
@@ -56,27 +54,27 @@ class Database(BData):
 
     def __init__(self, path: str, debug: bool = False) -> None:
         """Constructor."""
-        self._data[_Keys.DB_PATH] = path
-        self._data[_Keys.DEBUG] = debug
-        self._data[_Keys.DBH] = None
+        self._set_data(key=_Keys.DB_PATH, value=path, set_default_type=str)
+        self._set_data(key=_Keys.DEBUG, value=debug, set_default_type=bool)
+        self._set_data(key=_Keys.DBH, value=None, set_default_type=Optional[Engine])
 
         # create engine
         if self.__create_engine():
             base = LocalBase()
-            base.metadata.create_all(self._data[_Keys.DBH])
+            base.metadata.create_all(self._get_data(key=_Keys.DBH))  # type: ignore
 
     def __create_engine(self) -> bool:
         """Create Engine for sqlite database."""
         engine: Optional[Engine] = None
         try:
             engine = create_engine(
-                f"sqlite:///{self._data[_Keys.DB_PATH]}",
-                echo=self._data[_Keys.DEBUG],
+                f"sqlite:///{self._get_data(key=_Keys.DB_PATH)}",
+                echo=self._get_data(key=_Keys.DEBUG),
             )
         except Exception as ex:
             raise Raise.error(f"{ex}", OSError, self._c_name, currentframe())
         if engine is not None:
-            self._data[_Keys.DBH] = engine
+            self._set_data(key=_Keys.DBH, value=engine)
             return True
         return False
 
@@ -84,10 +82,10 @@ class Database(BData):
     def session(self) -> Optional[Session]:
         """Create Session from Database Engine."""
         session = None
-        if self._data[_Keys.DBH] is None:
+        if self._get_data(key=_Keys.DBH) is None:
             return None
         try:
-            session = Session(bind=self._data[_Keys.DBH])
+            session = Session(bind=self._get_data(key=_Keys.DBH))
         except Exception as ex:
             raise Raise.error(f"{ex}", OSError, self._c_name, currentframe())
         return session
