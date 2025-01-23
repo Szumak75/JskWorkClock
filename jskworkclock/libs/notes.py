@@ -35,8 +35,8 @@ class NotesDialog(BData, TkBase, tk.Toplevel):
         self.protocol("WM_DELETE_WINDOW", self.__bt_close)
 
         # init locals
-        self._data[Keys.DIALOG_RETURN] = None
-        self._data[Keys.TEXT] = ""
+        self._set_data(key=Keys.DIALOG_RETURN,value=None, set_default_type=Optional[bool])
+        self._set_data(key=Keys.TEXT,value="",set_default_type=str)
 
         self.__init_ui()
 
@@ -64,7 +64,7 @@ class NotesDialog(BData, TkBase, tk.Toplevel):
         )
         # add entry
         notes = ScrolledText(notes_frame, width=50, height=10)
-        self._data[Keys.D_NOTES] = notes
+        self._set_data(key=Keys.D_NOTES,value=notes,set_default_type=ScrolledText)
         notes.pack(side=Pack.Side.LEFT, fill=Pack.Fill.BOTH, expand=True)
 
         # separator
@@ -84,25 +84,25 @@ class NotesDialog(BData, TkBase, tk.Toplevel):
 
     def __bt_ok(self) -> None:
         """Button OK handler."""
-        self._data[Keys.DIALOG_RETURN] = True
-        notes: tk.Text = self._data[Keys.D_NOTES]
-        self._data[Keys.TEXT] = notes.get(1.0, tk.END)
+        self._set_data(key=Keys.DIALOG_RETURN,value=True)
+        notes: tk.Text = self._get_data(key=Keys.D_NOTES)  # type: ignore
+        self._set_data(key=Keys.TEXT,value=notes.get(1.0,tk.END))
         self.destroy()
 
     def __bt_close(self) -> None:
         """Button CLOSE handler."""
-        self._data[Keys.DIALOG_RETURN] = False
+        self._set_data(key=Keys.DIALOG_RETURN,value=False)
         self.destroy()
 
     @property
     def dialog_return(self) -> Optional[bool]:
         """Returns notes dialog decision."""
-        return self._data[Keys.DIALOG_RETURN]
+        return self._get_data(key=Keys.DIALOG_RETURN) # type: ignore
 
     @property
     def get_notes(self) -> str:
         """Returns notes text."""
-        return self._data[Keys.TEXT]
+        return self._get_data(key=Keys.TEXT) # type: ignore
 
 
 # #[EOF]#######################################################################
