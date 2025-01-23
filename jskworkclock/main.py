@@ -145,7 +145,6 @@ class WorkClock(tk.Tk, TkBase, BDbHandler):
         super().__init__()
 
         # init locals
-        self._data[Keys.W_REPORT] = None
         self._set_data(
             key=Keys.W_REPORT, value=None, set_default_type=Optional[ReportDialog]
         )
