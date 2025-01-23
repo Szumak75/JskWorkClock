@@ -162,14 +162,18 @@ class WorkClock(tk.Tk, TkBase, BDbHandler):
         # init GUI
         self.__init_ui()
 
-    def __init_db(self) -> None:
-        """Initialize database connection."""
-        tmp: str = os.path.join(
+    @property
+    def __db_path(self) -> str:
+        """Return database path."""
+        return os.path.join(
             Env().home,
             f"{self._get_data(key=Keys.CACHE_DIR)}",
             f"{self._get_data(key=Keys.DATABASE)}",
         )
-        db = Database(tmp)
+
+    def __init_db(self) -> None:
+        """Initialize database connection."""
+        db = Database(self.__db_path)
         if db is not None:
             self._db_handler = db
         else:
@@ -179,17 +183,11 @@ class WorkClock(tk.Tk, TkBase, BDbHandler):
 
     def __init_dirs(self) -> None:
         """Initialize local path for database."""
-        tmp: str = os.path.join(
-            Env().home,
-            f"{self._get_data(key=Keys.CACHE_DIR)}",
-            f"{self._get_data(key=Keys.DATABASE)}",
-        )
-        # print(tmp)
-        pc = PathChecker(tmp)
+        pc = PathChecker(self.__db_path)
         if not pc.exists:
             if not pc.create():
                 raise Raise.error(
-                    f"Cannot create local database: '{tmp}'",
+                    f"Cannot create local database: '{self.__db_path}'",
                     OSError,
                     self._c_name,
                     currentframe(),
@@ -232,6 +230,7 @@ class WorkClock(tk.Tk, TkBase, BDbHandler):
 
     def __about(self) -> None:
         """About dialog."""
+        # TODO: implement about dialog
         pass
 
     def __report(self) -> None:
