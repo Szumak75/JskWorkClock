@@ -129,6 +129,9 @@ class DataFrame(BData, TkBase, ttk.Frame):
         self._set_data(key=Keys.D_NOTES, value=notes, set_default_type=ScrolledText)
         notes.pack(side=Pack.Side.LEFT, fill=Pack.Fill.BOTH, expand=True)
 
+        # for proper resize master frame
+        self.update()
+
     @property
     def get_variables(self) -> tuple[Any, Any, Any, Any, Any]:
         """The get property."""
