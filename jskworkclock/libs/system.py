@@ -12,7 +12,7 @@ import os
 from typing import Optional
 from l10n import Locale, Locales
 
-from jsktoolbox.libs.system import Env
+from jsktoolbox.systemtool import Env
 from jsktoolbox.datetool import DateTime
 
 

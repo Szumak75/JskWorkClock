@@ -13,7 +13,7 @@ from tkinter import ttk
 from tkinter.scrolledtext import ScrolledText
 from typing import Optional
 
-from jsktoolbox.libs.base_data import BData
+from jsktoolbox.basetool.data import BData
 from jsktoolbox.tktool.base import TkBase
 from jsktoolbox.tktool.layout import Pack
 

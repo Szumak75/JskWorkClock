@@ -26,9 +26,9 @@ from tkcalendar import Calendar
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import func, and_
 
-from jsktoolbox.libs.base_data import BData
+from jsktoolbox.basetool.data import BData
 from jsktoolbox.datetool import DateTime, Timestamp
-from jsktoolbox.libs.system import Env
+from jsktoolbox.systemtool import Env
 from jsktoolbox.tktool.layout import Grid, Pack
 from jsktoolbox.tktool.base import TkBase
 

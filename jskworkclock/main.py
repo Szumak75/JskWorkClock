@@ -21,7 +21,7 @@ from threading import Thread
 from inspect import currentframe
 from datetime import timedelta
 from jsktoolbox.datetool import DateTime, Timestamp
-from jsktoolbox.libs.system import PathChecker, Env
+from jsktoolbox.systemtool import PathChecker, Env
 from jsktoolbox.raisetool import Raise
 from jsktoolbox.tktool.base import TkBase
 from jsktoolbox.tktool.layout import Pack
