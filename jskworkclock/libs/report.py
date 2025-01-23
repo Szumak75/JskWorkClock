@@ -14,7 +14,7 @@
 import tkinter as tk
 import pickle
 
-from tkinter import ttk
+from tkinter import StringVar, ttk
 from tkinter.scrolledtext import ScrolledText
 from tkinter.filedialog import asksaveasfile, askopenfile
 
@@ -78,59 +78,66 @@ class DataFrame(BData, TkBase, ttk.Frame):
         # date
         cal = Calendar(master=label_date)
         cal.pack(side=Pack.Side.TOP)
-        self._data[Keys.D_CALENDAR] = cal
-        # print(cal.selection_get())
+        self._set_data(key=Keys.D_CALENDAR, value=cal, set_default_type=Calendar)
 
         # elapsed time
-        self._data[Keys.D_RADIO] = tk.StringVar()
+        self._set_data(
+            key=Keys.D_RADIO, value=tk.StringVar(), set_default_type=tk.StringVar
+        )
         oprs: tuple[
             tuple[Literal["Add"], Literal["+"]],
             tuple[Literal["Subtract"], Literal["-"]],
         ] = (("Add", "+"), ("Subtract", "-"))
         for opr in oprs:
             ttk.Radiobutton(
-                label_time, text=opr[0], value=opr[1], variable=self._data[Keys.D_RADIO]
+                label_time, text=opr[0], value=opr[1], variable=self._get_data(key=Keys.D_RADIO)  # type: ignore
             ).pack(side=Pack.Side.TOP, fill=Pack.Fill.X, padx=5, pady=2)
-        self._data[Keys.D_RADIO].set("+")
-        self._data[Keys.D_HOUR] = tk.DoubleVar(value=0)
+        self._get_data(key=Keys.D_RADIO).set("+")  # type: ignore
+        self._set_data(
+            key=Keys.D_HOUR, value=tk.DoubleVar(value=0), set_default_type=tk.DoubleVar
+        )
         hour = ttk.Spinbox(
             label_time,
             from_=0,
             to=23,
-            textvariable=self._data[Keys.D_HOUR],
+            textvariable=self._get_data(key=Keys.D_HOUR),  # type: ignore
             width=10,
             wrap=True,
             state="readonly",
         )
-        self._data[Keys.D_HOUR].set(0)
+        self._get_data(key=Keys.D_HOUR).set(0)  # type: ignore
         hour.pack(side=Pack.Side.TOP, fill=Pack.Fill.X, padx=5, pady=5)
-        self._data[Keys.D_MINUTE] = tk.DoubleVar(value=0)
+        self._set_data(
+            key=Keys.D_MINUTE,
+            value=tk.DoubleVar(value=0),
+            set_default_type=tk.DoubleVar,
+        )
         minute = ttk.Spinbox(
             label_time,
             from_=0,
             to=59,
-            textvariable=self._data[Keys.D_MINUTE],
+            textvariable=self._get_data(key=Keys.D_MINUTE),  # type: ignore
             width=10,
             wrap=True,
             state="readonly",
         )
-        self._data[Keys.D_MINUTE].set(0)
+        self._get_data(key=Keys.D_MINUTE).set(0)  # type: ignore
         minute.pack(side=Pack.Side.TOP, fill=Pack.Fill.X, padx=5, pady=5)
 
         # notes
         notes = ScrolledText(label_note, width=46, height=8)
-        self._data[Keys.D_NOTES] = notes
+        self._set_data(key=Keys.D_NOTES, value=notes, set_default_type=ScrolledText)
         notes.pack(side=Pack.Side.LEFT, fill=Pack.Fill.BOTH, expand=True)
 
     @property
     def get_variables(self) -> tuple[Any, Any, Any, Any, Any]:
         """The get property."""
         return (
-            self._data[Keys.D_CALENDAR].selection_get(),
-            self._data[Keys.D_RADIO].get(),
-            self._data[Keys.D_HOUR].get(),
-            self._data[Keys.D_MINUTE].get(),
-            self._data[Keys.D_NOTES].get(1.0, tk.END),
+            self._get_data(key=Keys.D_CALENDAR).selection_get(),  # type: ignore
+            self._get_data(key=Keys.D_RADIO).get(),  # type: ignore
+            self._get_data(key=Keys.D_HOUR).get(),  # type: ignore
+            self._get_data(key=Keys.D_MINUTE).get(),  # type: ignore
+            self._get_data(key=Keys.D_NOTES).get(1.0, tk.END),  # type: ignore
         )
 
 
@@ -147,9 +154,11 @@ class AddDataDialog(BData, TkBase, tk.Toplevel):
         self.protocol("WM_DELETE_WINDOW", self.__bt_close)
 
         # init locals
-        self._data[Keys.W_CLOSED] = False
-        self._data[Keys.DIALOG_RETURN] = None
-        self._data[Keys.D_DATA] = None
+        self._set_data(key=Keys.W_CLOSED, value=False, set_default_type=bool)
+        self._set_data(
+            key=Keys.DIALOG_RETURN, value=None, set_default_type=Optional[bool]
+        )
+        self._set_data(key=Keys.D_DATA, value=None, set_default_type=Optional[Tuple])
 
         self.__init_ui()
 
@@ -173,7 +182,11 @@ class AddDataDialog(BData, TkBase, tk.Toplevel):
         # data frame
         data_frame = DataFrame(self)
         data_frame.pack(side=Pack.Side.TOP, fill=Pack.Fill.BOTH, expand=True)
-        self._data[Keys.D_FRAME] = data_frame
+        self._set_data(
+            key=Keys.D_FRAME,
+            value=data_frame,
+            set_default_type=DataFrame,
+        )
 
         # separator
         sep = ttk.Separator(self, orient=tk.HORIZONTAL)
@@ -193,24 +206,27 @@ class AddDataDialog(BData, TkBase, tk.Toplevel):
 
     def __bt_ok(self) -> None:
         """Button OK handler."""
-        self._data[Keys.DIALOG_RETURN] = True
-        self._data[Keys.D_DATA] = self._data[Keys.D_FRAME].get_variables
+        self._set_data(key=Keys.DIALOG_RETURN, value=True)
+        self._set_data(
+            key=Keys.D_DATA,
+            value=self._get_data(key=Keys.D_FRAME).get_variables,  # type: ignore
+        )
         self.destroy()
 
     def __bt_close(self) -> None:
         """Button 'Close' Event."""
-        self._data[Keys.DIALOG_RETURN] = False
+        self._set_data(key=Keys.DIALOG_RETURN, value=False)
         self.destroy()
 
     @property
     def dialog_return(self) -> Optional[bool]:
         """Returns notes dialog decision."""
-        return self._data[Keys.DIALOG_RETURN]
+        return self._get_data(key=Keys.DIALOG_RETURN)
 
     @property
     def dialog_data(self) -> Optional[Tuple]:
         """The dialog_data property."""
-        return self._data[Keys.D_DATA]
+        return self._get_data(key=Keys.D_DATA)
 
 
 class ReportDialog(TkBase, BDbHandler, tk.Toplevel):
@@ -224,7 +240,7 @@ class ReportDialog(TkBase, BDbHandler, tk.Toplevel):
         self.minsize(800, 500)
 
         # init locals
-        self._data[Keys.W_CLOSED] = False
+        self._set_data(key=Keys.W_CLOSED, value=False, set_default_type=bool)
         self._db_handler = dbh
 
         self.__init_ui()
@@ -232,7 +248,7 @@ class ReportDialog(TkBase, BDbHandler, tk.Toplevel):
     def __init_ui(self) -> None:
         """Create user interface."""
         # set initial flags
-        self._data[Keys.SWITCH_FLAG] = False
+        self._set_data(key=Keys.SWITCH_FLAG, value=False, set_default_type=bool)
 
         # main window
         self.geometry("700x600")
@@ -269,7 +285,11 @@ class ReportDialog(TkBase, BDbHandler, tk.Toplevel):
         tree.column(columns[2], minwidth=0, width=400)
 
         tree.pack(side=Pack.Side.LEFT, fill=Pack.Fill.BOTH, expand=True)
-        self._data[Keys.D_REPORT] = tree
+        self._set_data(
+            key=Keys.D_REPORT,
+            value=tree,
+            set_default_type=type(tree),
+        )
 
         # add a scrollbar
         scrollbar = ttk.Scrollbar(data_frame, orient=tk.VERTICAL, command=tree.yview)
@@ -304,7 +324,11 @@ class ReportDialog(TkBase, BDbHandler, tk.Toplevel):
             bt_frame, text="Switch to previous month", command=self.__bt_switch
         )
         switch_button.pack(side=Pack.Side.RIGHT, padx=2)
-        self._data[Keys.BT_SWITCH] = switch_button
+        self._set_data(
+            key=Keys.BT_SWITCH,
+            value=switch_button,
+            set_default_type=type(switch_button),
+        )
 
         # add export button
         export_button = ttk.Button(bt_frame, text="Export", command=self.__bt_export)
@@ -315,7 +339,7 @@ class ReportDialog(TkBase, BDbHandler, tk.Toplevel):
         import_button.pack(side=Pack.Side.RIGHT, padx=2)
 
     def __tree_reload(self) -> None:
-        tree: ttk.Treeview = self._data[Keys.D_REPORT]
+        tree: ttk.Treeview = self._get_data(key=Keys.D_REPORT)  # type: ignore
         # emptying tree
         for item in tree.get_children():
             tree.delete(item)
@@ -389,15 +413,17 @@ class ReportDialog(TkBase, BDbHandler, tk.Toplevel):
 
     def __on_closing(self) -> None:
         """On Closing Event."""
-        self._data[Keys.W_CLOSED] = True
+        self._set_data(key=Keys.W_CLOSED, value=True)
         self.destroy()
 
     def __bt_switch(self) -> None:
         """Button 'Switch' Event."""
-        bt: ttk.Button = self._data[Keys.BT_SWITCH]
-        self._data[Keys.SWITCH_FLAG] = not self._data[Keys.SWITCH_FLAG]
+        bt: ttk.Button = self._get_data(key=Keys.BT_SWITCH)  # type: ignore
+        self._set_data(
+            key=Keys.SWITCH_FLAG, value=(not self._get_data(key=Keys.SWITCH_FLAG))
+        )
 
-        if self._data[Keys.SWITCH_FLAG]:
+        if self._get_data(key=Keys.SWITCH_FLAG):
             bt["text"] = "Switch to current month"
         else:
             bt["text"] = "Switch to previous month"
@@ -433,7 +459,7 @@ class ReportDialog(TkBase, BDbHandler, tk.Toplevel):
         )
         self.focus()
         if file is not None:
-            tree: ttk.Treeview = self._data[Keys.D_REPORT]
+            tree: ttk.Treeview = self._get_data(key=Keys.D_REPORT)  # type: ignore
             for child in tree.get_children():
                 list_data: List = tree.item(child)["values"]  # type: ignore
                 start = list_data[0]
@@ -487,7 +513,7 @@ class ReportDialog(TkBase, BDbHandler, tk.Toplevel):
         date_sum = 0
         out = list()
         tmp: datetime = DateTime.now()
-        if self._data[Keys.SWITCH_FLAG]:
+        if self._get_data(key=Keys.SWITCH_FLAG):
             # reset initial time to previous month
             tmp2 = datetime(year=tmp.year, month=tmp.month, day=1)
             tmp = DateTime.datetime_from_timestamp(tmp2.timestamp() - 1)
@@ -554,7 +580,7 @@ class ReportDialog(TkBase, BDbHandler, tk.Toplevel):
     @property
     def is_closed(self) -> bool:
         """The is_closed property."""
-        return self._data[Keys.W_CLOSED]
+        return self._get_data(key=Keys.W_CLOSED)  # type: ignore
 
 
 # #[EOF]#######################################################################
