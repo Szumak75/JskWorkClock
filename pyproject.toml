@@ -8,7 +8,7 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.11"
 sqlalchemy = "2.0.36"
-jsktoolbox = "1.0.22"
+jsktoolbox = "^1.1.2"
 pystray = "^0.19.5"
 tkcalendar = "^1.6.1"
 babel = "^2.14.0"
