@@ -342,6 +342,7 @@ class ReportDialog(TkBase, BDbHandler, tk.Toplevel):
         import_button.pack(side=Pack.Side.RIGHT, padx=2)
 
     def __tree_reload(self) -> None:
+        """Reload tree data."""
         tree: ttk.Treeview = self._get_data(key=Keys.D_REPORT)  # type: ignore
         # emptying tree
         for item in tree.get_children():

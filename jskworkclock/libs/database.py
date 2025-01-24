@@ -3,7 +3,7 @@
   Author:  Jacek 'Szumak' Kotlarski --<szumak@virthost.pl>
   Created: 11.12.2023
 
-  Purpose: database classes
+  Purpose: database classes.
 """
 
 from inspect import currentframe
